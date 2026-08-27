@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "titulo": "Estudar Python",
+    "descricao": "Revisar funções, listas e dicionários",
+    "concluida": false,
+    "data_criacao": "2026-08-26"
+  },
+  {
+    "id": 2,
+    "titulo": "Aprender Flask",
+    "descricao": "Criar uma API REST simples do zero",
+    "concluida": true,
+    "data_criacao": "2026-08-25"
+  }
+]

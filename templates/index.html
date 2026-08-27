@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager · Organize suas tarefas</title>
+  <meta name="description" content="Gerenciador de tarefas simples, moderno e responsivo." />
+
+  <!-- Fontes: Sora para títulos (geométrica, moderna) e Inter para o corpo do texto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <!-- Barra fina de progresso geral, no topo da página (elemento de assinatura visual) -->
+  <div class="progress-thread" id="progressThread" aria-hidden="true"></div>
+
+  <div class="app-shell">
+
+    <!-- ===================== CABEÇALHO ===================== -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>Task Manager</h1>
+          <p>seu fluxo de tarefas, sem ruído</p>
+        </div>
+      </div>
+      <div class="header-date" id="headerDate"></div>
+    </header>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section class="dashboard" aria-label="Resumo das tarefas">
+      <article class="stat-card">
+        <span class="stat-icon icon-total" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <div class="stat-info">
+          <strong id="statTotal">0</strong>
+          <span>Total de tarefas</span>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-icon icon-done" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="stat-info">
+          <strong id="statConcluidas">0</strong>
+          <span>Concluídas</span>
+        </div>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-icon icon-pending" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <div class="stat-info">
+          <strong id="statPendentes">0</strong>
+          <span>Pendentes</span>
+        </div>
+      </article>
+
+      <article class="stat-card stat-card--rate">
+        <span class="stat-icon icon-rate" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 17l6-6 4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div class="stat-info">
+          <strong id="statTaxa">0%</strong>
+          <span>Taxa de conclusão</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- ===================== FORMULÁRIO ===================== -->
+    <section class="task-form-card" aria-label="Adicionar nova tarefa">
+      <form id="taskForm" autocomplete="off">
+        <div class="form-row">
+          <input
+            type="text"
+            id="titulo"
+            name="titulo"
+            placeholder="O que você precisa fazer?"
+            maxlength="80"
+            required
+          />
+          <button type="submit" class="btn-add" id="btnAdd">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span>Adicionar</span>
+          </button>
+        </div>
+        <input
+          type="text"
+          id="descricao"
+          name="descricao"
+          placeholder="Descrição (opcional)"
+          maxlength="200"
+        />
+      </form>
+    </section>
+
+    <!-- ===================== LISTA DE TAREFAS ===================== -->
+    <section class="task-list-section">
+      <div class="task-list-header">
+        <h2>Minhas tarefas</h2>
+        <div class="task-filters" role="tablist" aria-label="Filtrar tarefas">
+          <button class="filter-btn is-active" data-filter="todas" role="tab" aria-selected="true">Todas</button>
+          <button class="filter-btn" data-filter="pendentes" role="tab" aria-selected="false">Pendentes</button>
+          <button class="filter-btn" data-filter="concluidas" role="tab" aria-selected="false">Concluídas</button>
+        </div>
+      </div>
+
+      <ul id="taskList" class="task-list"></ul>
+
+      <div id="emptyState" class="empty-state" hidden>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6"/></svg>
+        <p id="emptyStateText">Nenhuma tarefa por aqui ainda. Adicione a primeira acima.</p>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Feito com Python, Flask e JavaScript puro · Task Manager</p>
+    </footer>
+  </div>
+
+  <!-- ===================== MODAL DE EDIÇÃO ===================== -->
+  <div class="modal-overlay" id="editModalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <h3 id="editModalTitle">Editar tarefa</h3>
+      <form id="editForm">
+        <label for="editTitulo">Título</label>
+        <input type="text" id="editTitulo" maxlength="80" required />
+
+        <label for="editDescricao">Descrição</label>
+        <textarea id="editDescricao" maxlength="200" rows="3"></textarea>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btnCancelEdit">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DE CONFIRMAÇÃO (EXCLUIR) ===================== -->
+  <div class="modal-overlay" id="confirmModalOverlay" hidden>
+    <div class="modal modal--confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <h3 id="confirmTitle">Excluir tarefa?</h3>
+      <p>Essa ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="btnCancelDelete">Cancelar</button>
+        <button type="button" class="btn-danger" id="btnConfirmDelete">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de toasts (mensagens de feedback) -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
