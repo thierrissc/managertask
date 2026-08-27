@@ -1,21 +1,3 @@
-"""
-Task Manager - Backend Flask
-==============================
-API REST simples para gerenciar tarefas, usando um arquivo JSON como
-"banco de dados". Não usa nenhum banco de dados real nem bibliotecas
-externas além do Flask, para manter o projeto leve e fácil de estudar.
-
-Endpoints disponíveis:
-    GET    /api/tasks              -> lista todas as tarefas
-    POST   /api/tasks              -> cria uma nova tarefa
-    PUT    /api/tasks/<id>         -> edita título/descrição de uma tarefa
-    DELETE /api/tasks/<id>         -> remove uma tarefa
-    PATCH  /api/tasks/<id>/toggle  -> alterna concluída/pendente
-
-    GET    /api/stats              -> estatísticas do dashboard
-    GET    /                       -> página principal (index.html)
-"""
-
 import json
 import os
 from datetime import datetime
@@ -36,21 +18,7 @@ app = Flask(
 
 
 def _get_data_path():
-    """
-    Retorna o caminho do arquivo de dados a ser usado.
 
-    Observação importante sobre o deploy na Vercel:
-    Funções serverless da Vercel têm sistema de arquivos SOMENTE LEITURA,
-    exceto pela pasta /tmp. Ou seja, não é possível gravar permanentemente
-    em data/tarefas.json em produção. Para o projeto continuar funcionando
-    (criar/editar/excluir tarefas) mesmo na Vercel, usamos /tmp/tarefas.json
-    como cópia de trabalho quando detectamos que estamos rodando lá.
-
-    Isso é suficiente para fins de estudo e portfólio, mas é importante
-    saber que, na Vercel, os dados são reiniciados a cada novo "cold start"
-    (o arquivo original em /data volta a ser o ponto de partida). Para um
-    projeto real em produção, o ideal seria usar um banco de dados externo.
-    """
     if os.environ.get("VERCEL"):
         tmp_file = "/tmp/tarefas.json"
         if not os.path.exists(tmp_file):
@@ -77,7 +45,6 @@ def ler_tarefas():
 
 
 def salvar_tarefas(tarefas):
-    """Grava a lista de tarefas no arquivo JSON, formatada e legível."""
     caminho = _get_data_path()
     os.makedirs(os.path.dirname(caminho), exist_ok=True)
     with open(caminho, "w", encoding="utf-8") as arquivo:
@@ -85,7 +52,6 @@ def salvar_tarefas(tarefas):
 
 
 def proximo_id(tarefas):
-    """Calcula o próximo ID disponível (maior id existente + 1)."""
     if not tarefas:
         return 1
     return max(tarefa["id"] for tarefa in tarefas) + 1
@@ -93,13 +59,11 @@ def proximo_id(tarefas):
 
 @app.route("/")
 def index():
-    """Renderiza a página principal (SPA simples com HTML + JS)."""
     return render_template("index.html")
 
 
 @app.route("/api/tasks", methods=["GET"])
 def listar_tarefas():
-    """Retorna todas as tarefas cadastradas, da mais recente para a mais antiga."""
     tarefas = ler_tarefas()
     tarefas_ordenadas = sorted(tarefas, key=lambda t: t["id"], reverse=True)
     return jsonify(tarefas_ordenadas), 200
