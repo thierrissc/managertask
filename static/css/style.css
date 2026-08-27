@@ -11,10 +11,10 @@
   /* Cores base */
   --bg: #14151c;
   --bg-soft: #191b23;
-  --surface: #3a0ca3;
-  --surface-hover: #3a0ca3;
-  --border: #3a0ca3;
-  --border-soft: #3a0ca3;
+  --surface: #1d1f29;
+  --surface-hover: #242732;
+  --border: #2b2e3b;
+  --border-soft: #24262f;
 
   /* Texto */
   --text-primary: #edeef4;
@@ -29,8 +29,8 @@
   --success-soft: rgba(47, 212, 165, 0.14);
   --warning: #fff275;
   --warning-soft: rgba(255, 242, 117, 0.14);
-  --danger: #d4344c;
-  --danger-soft: rgba(212, 52, 76, 0.12);
+  --danger: #ff6b81;
+  --danger-soft: rgba(255, 107, 129, 0.12);
 
   /* Tipografia */
   --font-display: "Sora", "Segoe UI", sans-serif;
