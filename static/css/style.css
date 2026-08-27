@@ -79,7 +79,7 @@ ul {
 }
 
 ::selection {
-  background: var(--iris);
+  background: var(--butter-deep);
   color: var(--on-iris);
 }
 
@@ -174,7 +174,7 @@ ul {
 }
 
 .rate-badge {
-  background: var(--butter);
+  background: var(--iris-deep);
   color: var(--iris);
   font-family: var(--font-display);
   font-size: 16px;
