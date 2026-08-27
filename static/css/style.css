@@ -1,36 +1,45 @@
 /* =========================================================================
    TASK MANAGER · STYLE.CSS
-   Tema: "graphite & violet" — fundo grafite profundo, tipografia geométrica
-   (Sora) para títulos, Inter para corpo, e um acento violeta/índigo que
-   percorre a interface como um "fio" de progresso (o elemento de assinatura
-   da página, ligado à taxa de conclusão das tarefas).
+   Conceito: "ficha de tarefas" — uma capa sólida em Royal Iris (como a
+   lombada de uma agenda) ao lado de um miolo em Butter Yellow, onde as
+   tarefas viram "tickets" com aba serrilhada, referenciando o próprio
+   selo do logo (quadrado arredondado + check). Sem dashboard genérico de
+   cards cinza — os números viram uma "ficha" na capa, e o status de cada
+   tarefa (concluída/pendente) mantém cores próprias, fora da paleta
+   principal, para nunca se confundir com o fundo.
    ========================================================================= */
 
 /* ---------------------------- TOKENS DE DESIGN --------------------------- */
 :root {
-  /* Cores base */
-  --bg: #14151c;
-  --bg-soft: #191b23;
-  --surface: #1d1f29;
-  --surface-hover: #242732;
-  --border: #2b2e3b;
-  --border-soft: #24262f;
+  /* Paleta principal */
+  --iris: #3a0ca3;
+  --iris-deep: #26075f;
+  --iris-soft: rgba(58, 12, 163, 0.08);
+  --iris-soft-strong: rgba(58, 12, 163, 0.16);
+
+  --butter: #fff275;
+  --butter-deep: #f2e14a;
+
+  /* Superfícies */
+  --page-bg: var(--butter);
+  --paper: #fffdf3;
+  --paper-alt: #fff9de;
 
   /* Texto */
-  --text-primary: #edeef4;
-  --text-secondary: #9195a8;
-  --text-muted: #63667a;
+  --ink: #241245;
+  --ink-soft: #6b5e8c;
+  --ink-faint: #9187ab;
+  --on-iris: #fbf9ff;
+  --on-iris-soft: rgba(251, 249, 255, 0.68);
 
-  /* Acentos — Royal Iris (primário) & Butter Yellow (destaque de pendências) */
-  --accent: #3a0ca3;
-  --accent-strong: #6425d6;
-  --accent-soft: rgba(58, 12, 163, 0.22);
-  --success: #2fd4a5;
-  --success-soft: rgba(47, 212, 165, 0.14);
-  --warning: #fff275;
-  --warning-soft: rgba(255, 242, 117, 0.14);
-  --danger: #ff6b81;
-  --danger-soft: rgba(255, 107, 129, 0.12);
+  /* Cores de status — deliberadamente fora da paleta principal, para não
+     se misturarem nem com o fundo amarelo, nem com a capa violeta */
+  --done: #1f9e6d;
+  --done-soft: rgba(31, 158, 109, 0.12);
+  --pending: #ff7d3d;
+  --pending-soft: rgba(255, 125, 61, 0.14);
+  --danger: #e13b5a;
+  --danger-soft: rgba(225, 59, 90, 0.1);
 
   /* Tipografia */
   --font-display: "Sora", "Segoe UI", sans-serif;
@@ -38,9 +47,10 @@
 
   /* Layout */
   --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --shadow-ticket: 0 10px 26px rgba(36, 18, 69, 0.14);
+  --shadow-modal: 0 20px 50px rgba(36, 18, 69, 0.35);
   --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -56,8 +66,8 @@ body {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text-primary);
+  background: var(--page-bg);
+  color: var(--ink);
   font-family: var(--font-body);
   min-height: 100vh;
   line-height: 1.5;
@@ -88,38 +98,29 @@ ul {
 }
 
 ::selection {
-  background: var(--accent-soft);
-  color: var(--text-primary);
-}
-
-/* --------------------------- BARRA DE PROGRESSO -------------------------- */
-/* Elemento de assinatura: um fio fino no topo da tela que se enche
-   conforme a taxa de conclusão das tarefas aumenta. */
-.progress-thread {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent), var(--warning));
-  z-index: 100;
-  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--iris);
+  color: var(--on-iris);
 }
 
 /* --------------------------------- SHELL --------------------------------- */
 .app-shell {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 40px 24px 80px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+  align-items: start;
 }
 
-/* -------------------------------- CABEÇALHO ------------------------------ */
-.app-header {
+/* ----------------------------- PAINEL LATERAL ----------------------------- */
+.side-panel {
+  background: var(--iris);
+  color: var(--on-iris);
+  padding: 40px 28px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  gap: 16px;
+  flex-direction: column;
+  gap: 36px;
 }
 
 .brand {
@@ -129,129 +130,110 @@ ul {
 }
 
 .brand-mark {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-mark svg {
-  width: 24px;
-  height: 24px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
 }
 
 .brand-text h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  color: var(--on-iris);
 }
 
 .brand-text p {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--text-muted);
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--on-iris-soft);
 }
 
-.header-date {
-  font-size: 13px;
-  color: var(--text-muted);
-  text-transform: capitalize;
-  white-space: nowrap;
-}
-
-/* -------------------------------- DASHBOARD ------------------------------ */
-.dashboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 28px;
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: transform var(--transition), border-color var(--transition);
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border);
-}
-
-.stat-icon {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.icon-total {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.icon-done {
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.icon-pending {
-  background: var(--warning-soft);
-  color: var(--warning);
-}
-
-.icon-rate {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.stat-info {
+/* Ficha de números, como o resumo escrito na capa de uma agenda */
+.ledger {
   display: flex;
   flex-direction: column;
-  min-width: 0;
 }
 
-.stat-info strong {
+.ledger-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px dashed rgba(255, 242, 117, 0.35);
+}
+
+.ledger-row:first-child {
+  padding-top: 0;
+}
+
+.ledger-row strong {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
-  line-height: 1.1;
+  color: var(--on-iris);
+  order: 2;
 }
 
-.stat-info span {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.ledger-row span {
+  font-size: 12.5px;
+  color: var(--on-iris-soft);
+  order: 1;
+}
+
+.ledger-row--rate {
+  border-bottom: none;
+  align-items: center;
+  padding-top: 18px;
+}
+
+.ledger-row--rate span {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.rate-badge {
+  background: var(--butter);
+  color: var(--iris);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 999px;
+}
+
+.side-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(255, 242, 117, 0.35);
+  font-size: 11.5px;
+  color: var(--on-iris-soft);
+}
+
+.side-footer span {
+  display: block;
+  text-transform: capitalize;
+  margin-bottom: 4px;
+}
+
+.side-footer p {
+  margin: 0;
+}
+
+/* ------------------------------- MAIN PANEL ------------------------------- */
+.main-panel {
+  padding: 40px 40px 64px;
+  max-width: 760px;
 }
 
 /* ------------------------------ FORMULÁRIO ------------------------------- */
 .task-form-card {
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
+  background: var(--paper);
+  border: 2px solid var(--iris);
   border-radius: var(--radius-lg);
   padding: 18px;
   margin-bottom: 32px;
+  box-shadow: var(--shadow-ticket);
 }
 
 .form-row {
@@ -261,9 +243,9 @@ ul {
 
 #taskForm input[type="text"] {
   width: 100%;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
+  background: var(--paper-alt);
+  border: 1.5px solid var(--iris-soft-strong);
+  color: var(--ink);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   font-size: 14.5px;
@@ -272,12 +254,12 @@ ul {
 }
 
 #taskForm input[type="text"]::placeholder {
-  color: var(--text-muted);
+  color: var(--ink-faint);
 }
 
 #taskForm input[type="text"]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--iris);
+  box-shadow: 0 0 0 3px var(--iris-soft);
 }
 
 #descricao {
@@ -288,13 +270,13 @@ ul {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--iris);
+  color: var(--on-iris);
   border: none;
   border-radius: var(--radius-sm);
   padding: 0 20px;
   font-size: 14.5px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   transition: background var(--transition), transform var(--transition);
 }
@@ -305,7 +287,7 @@ ul {
 }
 
 .btn-add:hover {
-  background: var(--accent-strong);
+  background: var(--iris-deep);
   transform: translateY(-1px);
 }
 
@@ -328,16 +310,16 @@ ul {
 }
 
 .task-list-header h2 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .task-filters {
   display: flex;
-  gap: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
+  gap: 4px;
+  background: var(--paper);
+  border: 1.5px solid var(--iris-soft-strong);
   border-radius: 999px;
   padding: 4px;
 }
@@ -345,49 +327,48 @@ ul {
 .filter-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 6px 14px;
   border-radius: 999px;
   transition: background var(--transition), color var(--transition);
 }
 
 .filter-btn.is-active {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+  background: var(--iris);
+  color: var(--on-iris);
 }
 
 .filter-btn:hover:not(.is-active) {
-  color: var(--text-secondary);
+  color: var(--ink);
 }
 
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-/* --------------------------------- CARD ---------------------------------- */
+/* --------------------------- CARD ("TICKET") ------------------------------ */
 .task-card {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-left: 3px solid var(--warning);
+  align-items: stretch;
+  background: var(--paper);
+  border: 2px solid var(--pending);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  box-shadow: var(--shadow-ticket);
   animation: card-in 320ms cubic-bezier(0.4, 0, 0.2, 1);
-  transition: border-color var(--transition), background var(--transition);
+  transition: border-color var(--transition), transform var(--transition);
+  overflow: hidden;
 }
 
 .task-card:hover {
-  background: var(--surface-hover);
+  transform: translateY(-2px);
 }
 
 .task-card.is-done {
-  border-left-color: var(--success);
+  border-color: var(--done);
 }
 
 @keyframes card-in {
@@ -416,14 +397,23 @@ ul {
   }
 }
 
-/* Checkbox customizado */
+.task-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+/* Checkbox customizado — mesma forma do selo do logo */
 .task-checkbox {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   margin-top: 2px;
-  border-radius: 7px;
-  border: 2px solid var(--border);
+  border-radius: 8px;
+  border: 2px solid var(--iris-soft-strong);
   background: transparent;
   display: flex;
   align-items: center;
@@ -441,12 +431,12 @@ ul {
 }
 
 .task-checkbox:hover {
-  border-color: var(--accent);
+  border-color: var(--iris);
 }
 
 .task-checkbox.is-checked {
-  background: var(--success);
-  border-color: var(--success);
+  background: var(--done);
+  border-color: var(--done);
 }
 
 .task-checkbox.is-checked svg {
@@ -461,26 +451,26 @@ ul {
 
 .task-title {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 700;
+  color: var(--ink);
   word-break: break-word;
   transition: color var(--transition);
 }
 
 .task-card.is-done .task-title {
-  color: var(--text-muted);
+  color: var(--ink-faint);
   text-decoration: line-through;
 }
 
 .task-description {
   font-size: 13.5px;
-  color: var(--text-secondary);
+  color: var(--ink-soft);
   margin-top: 3px;
   word-break: break-word;
 }
 
 .task-card.is-done .task-description {
-  color: var(--text-muted);
+  color: var(--ink-faint);
 }
 
 .task-date {
@@ -488,23 +478,28 @@ ul {
   align-items: center;
   gap: 5px;
   font-size: 11.5px;
-  color: var(--text-muted);
+  color: var(--ink-faint);
   margin-top: 8px;
 }
 
+/* Aba do ticket: separada por uma linha pontilhada, como a serrilha
+   de um bilhete que se destaca do corpo principal */
 .task-actions {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
   flex-shrink: 0;
+  padding: 0 8px;
+  border-left: 2px dashed var(--iris-soft-strong);
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
-  border-radius: 8px;
+  color: var(--ink-faint);
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -517,8 +512,8 @@ ul {
 }
 
 .icon-btn:hover {
-  background: var(--bg-soft);
-  color: var(--text-primary);
+  background: var(--iris-soft);
+  color: var(--iris);
 }
 
 .icon-btn.icon-btn--danger:hover {
@@ -530,14 +525,14 @@ ul {
 .empty-state {
   text-align: center;
   padding: 48px 20px;
-  color: var(--text-muted);
+  color: var(--ink-faint);
 }
 
 .empty-state svg {
   width: 40px;
   height: 40px;
   margin-bottom: 12px;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .empty-state p {
@@ -547,9 +542,9 @@ ul {
 
 /* --------------------------------- FOOTER -------------------------------- */
 .app-footer {
-  text-align: center;
+  text-align: left;
   margin-top: 48px;
-  color: var(--text-muted);
+  color: var(--ink-faint);
   font-size: 12px;
 }
 
@@ -557,7 +552,7 @@ ul {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 11, 15, 0.65);
+  background: rgba(38, 7, 95, 0.55);
   backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
@@ -567,10 +562,10 @@ ul {
   animation: overlay-in 160ms ease;
 }
 
-/* IMPORTANTE: sem esta regra, o `display: flex` acima vence o `display: none`
-   nativo do atributo [hidden], porque regras de autor têm prioridade sobre o
-   estilo padrão do navegador. Isso fazia os modais aparecerem sempre visíveis,
-   mesmo antes de qualquer clique. */
+/* IMPORTANTE: sem esta regra, o `display: flex` acima venceria o
+   `display: none` nativo do atributo [hidden], porque regras de autor
+   têm prioridade sobre o estilo padrão do navegador — os modais ficariam
+   sempre visíveis mesmo antes de qualquer clique. */
 .modal-overlay[hidden] {
   display: none;
 }
@@ -587,11 +582,11 @@ ul {
 .modal {
   width: 100%;
   max-width: 380px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--paper);
+  border: 2px solid var(--iris);
   border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-modal);
   animation: modal-in 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -609,27 +604,29 @@ ul {
 .modal h3 {
   font-size: 17px;
   margin-bottom: 14px;
+  color: var(--ink);
 }
 
 .modal--confirm p {
   font-size: 13.5px;
-  color: var(--text-secondary);
+  color: var(--ink-soft);
   margin: 0 0 20px;
 }
 
 .modal label {
   display: block;
   font-size: 12.5px;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   margin: 14px 0 6px;
+  font-weight: 600;
 }
 
 .modal input,
 .modal textarea {
   width: 100%;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
+  background: var(--paper-alt);
+  border: 1.5px solid var(--iris-soft-strong);
+  color: var(--ink);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: 14px;
@@ -640,8 +637,8 @@ ul {
 
 .modal input:focus,
 .modal textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--iris);
+  box-shadow: 0 0 0 3px var(--iris-soft);
 }
 
 .modal-actions {
@@ -658,28 +655,28 @@ ul {
   border-radius: var(--radius-sm);
   padding: 10px 18px;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 700;
   transition: background var(--transition), transform var(--transition);
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
+  background: var(--iris);
+  color: var(--on-iris);
 }
 
 .btn-primary:hover {
-  background: var(--accent-strong);
+  background: var(--iris-deep);
 }
 
 .btn-secondary {
-  background: var(--bg-soft);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+  border: 1.5px solid var(--iris-soft-strong);
 }
 
 .btn-secondary:hover {
-  color: var(--text-primary);
-  border-color: var(--text-muted);
+  color: var(--ink);
+  border-color: var(--iris);
 }
 
 .btn-danger {
@@ -688,7 +685,7 @@ ul {
 }
 
 .btn-danger:hover {
-  background: #ff8395;
+  background: #c62c48;
 }
 
 /* --------------------------------- TOASTS -------------------------------- */
@@ -706,14 +703,14 @@ ul {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--success);
-  color: var(--text-primary);
+  background: var(--paper);
+  border: 1.5px solid var(--iris-soft-strong);
+  border-left: 3px solid var(--done);
+  color: var(--ink);
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   font-size: 13.5px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-ticket);
   min-width: 220px;
   max-width: 320px;
   animation: toast-in 220ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -749,7 +746,7 @@ ul {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  color: var(--success);
+  color: var(--done);
 }
 
 .toast.toast--error .toast-icon {
@@ -757,26 +754,60 @@ ul {
 }
 
 /* ------------------------------- RESPONSIVO ------------------------------ */
-@media (max-width: 720px) {
-  .dashboard {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    position: static;
+    min-height: 0;
+    padding: 24px 20px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .brand {
+    flex: 1 1 auto;
+  }
+
+  .ledger {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    flex: 1 1 100%;
+  }
+
+  .ledger-row {
+    border-bottom: none;
+    padding: 0;
+    gap: 8px;
+  }
+
+  .ledger-row strong {
+    font-size: 20px;
+  }
+
+  .ledger-row--rate {
+    padding-top: 0;
+  }
+
+  .side-footer {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    flex: 1 1 100%;
+  }
+
+  .main-panel {
+    max-width: none;
+    padding: 28px 20px 56px;
   }
 }
 
 @media (max-width: 560px) {
-  .app-shell {
-    padding: 28px 16px 60px;
-  }
-
-  .app-header {
-    flex-wrap: wrap;
-  }
-
-  .header-date {
-    order: 3;
-    font-size: 12px;
-  }
-
   .form-row {
     flex-direction: column;
   }
@@ -786,8 +817,12 @@ ul {
     padding: 12px;
   }
 
-  .task-card {
+  .task-main {
     padding: 12px;
+  }
+
+  .task-actions {
+    padding: 0 6px;
   }
 
   .toast-container {
@@ -805,7 +840,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent-strong);
+  outline: 2px solid var(--iris);
   outline-offset: 2px;
 }
 

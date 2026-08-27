@@ -19,7 +19,6 @@
   const emptyState = document.getElementById("emptyState");
   const emptyStateText = document.getElementById("emptyStateText");
   const headerDate = document.getElementById("headerDate");
-  const progressThread = document.getElementById("progressThread");
 
   const statTotal = document.getElementById("statTotal");
   const statConcluidas = document.getElementById("statConcluidas");
@@ -200,23 +199,25 @@
     li.dataset.id = tarefa.id;
 
     li.innerHTML = `
-      <button
-        class="task-checkbox${tarefa.concluida ? " is-checked" : ""}"
-        aria-label="${tarefa.concluida ? "Desmarcar conclusão" : "Marcar como concluída"}"
-        aria-pressed="${tarefa.concluida}"
-      >
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="task-main">
+        <button
+          class="task-checkbox${tarefa.concluida ? " is-checked" : ""}"
+          aria-label="${tarefa.concluida ? "Desmarcar conclusão" : "Marcar como concluída"}"
+          aria-pressed="${tarefa.concluida}"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
 
-      <div class="task-body">
-        <p class="task-title">${escapeHtml(tarefa.titulo)}</p>
-        ${tarefa.descricao ? `<p class="task-description">${escapeHtml(tarefa.descricao)}</p>` : ""}
-        <span class="task-date">
-          <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          ${formatarData(tarefa.data_criacao)}
-        </span>
+        <div class="task-body">
+          <p class="task-title">${escapeHtml(tarefa.titulo)}</p>
+          ${tarefa.descricao ? `<p class="task-description">${escapeHtml(tarefa.descricao)}</p>` : ""}
+          <span class="task-date">
+            <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            ${formatarData(tarefa.data_criacao)}
+          </span>
+        </div>
       </div>
 
       <div class="task-actions">
@@ -247,9 +248,6 @@
     statConcluidas.textContent = concluidas;
     statPendentes.textContent = pendentes;
     statTaxa.textContent = `${taxa}%`;
-
-    // Atualiza o "fio" de progresso no topo da página
-    progressThread.style.width = `${taxa}%`;
   }
 
   /* ------------------------------------------------------------------------ */
