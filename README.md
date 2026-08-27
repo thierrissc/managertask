@@ -1,4 +1,4 @@
-# ✅ Easy Task
+# Task Manager
 
 Um gerenciador de tarefas web simples, moderno e responsivo — construído com **Python + Flask** no backend e **HTML, CSS e JavaScript puro** no frontend, usando um **arquivo JSON** como armazenamento. Projeto pensado para estudo e portfólio, sem banco de dados, sem Docker e sem bibliotecas externas desnecessárias.
 
@@ -7,20 +7,20 @@ Um gerenciador de tarefas web simples, moderno e responsivo — construído com 
 ![flask](https://img.shields.io/badge/flask-3.x-7c6bff)
 
 
-## 📋 Descrição
+##  Descrição
 
 O **Task Manager** permite criar, editar, concluir e excluir tarefas através de uma interface escura, minimalista e inspirada em ferramentas como Todoist, Notion e Trello. Todas as ações acontecem sem recarregar a página (via `fetch`), com feedback visual em tempo real: toasts de sucesso/erro, modais de confirmação e um dashboard com estatísticas.
 
 ### Funcionalidades
 
-- ➕ Adicionar tarefa (título + descrição opcional)
-- ✏️ Editar tarefa (modal dedicado)
-- 🗑️ Excluir tarefa (com confirmação)
-- ☑️ Marcar/desmarcar conclusão
-- 📊 Dashboard com total, concluídas, pendentes e taxa de conclusão
-- 🔍 Filtros: todas / pendentes / concluídas
-- 🔔 Toasts de feedback e animações suaves
-- 📱 Totalmente responsivo (mobile e desktop)
+-  Adicionar tarefa (título + descrição opcional)
+-  Editar tarefa (modal dedicado)
+-  Excluir tarefa (com confirmação)
+-  Marcar/desmarcar conclusão
+-  Dashboard com total, concluídas, pendentes e taxa de conclusão
+-  Filtros: todas / pendentes / concluídas
+-  Toasts de feedback e animações suaves
+-  Totalmente responsivo (mobile e desktop)
 
 
 ## 🛠️ Tecnologias
@@ -33,7 +33,7 @@ O **Task Manager** permite criar, editar, concluir e excluir tarefas através de
 | Deploy        | Vercel (sem Docker, sem banco de dados) |
 
 
-## 📁 Estrutura do projeto
+##  Estrutura do projeto
 
 ```text
 task-manager/
@@ -113,7 +113,7 @@ task-manager/
 Pronto! A aplicação já estará funcionando localmente, salvando as tarefas em `data/tarefas.json`.
 
 
-### ⚠️ Observação importante sobre o armazenamento em produção
+###  Observação importante sobre o armazenamento em produção
 
 Funções serverless da Vercel possuem sistema de arquivos **somente leitura**, com exceção da pasta temporária `/tmp`. Por isso, o backend detecta automaticamente quando está rodando na Vercel (variável de ambiente `VERCEL`) e passa a gravar as tarefas em `/tmp/tarefas.json` em vez do arquivo original.
 
