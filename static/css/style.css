@@ -1,17 +1,5 @@
-/* =========================================================================
-   TASK MANAGER · STYLE.CSS
-   Conceito: "ficha de tarefas" — uma capa sólida em Royal Iris (como a
-   lombada de uma agenda) ao lado de um miolo em Butter Yellow, onde as
-   tarefas viram "tickets" com aba serrilhada, referenciando o próprio
-   selo do logo (quadrado arredondado + check). Sem dashboard genérico de
-   cards cinza — os números viram uma "ficha" na capa, e o status de cada
-   tarefa (concluída/pendente) mantém cores próprias, fora da paleta
-   principal, para nunca se confundir com o fundo.
-   ========================================================================= */
-
-/* ---------------------------- TOKENS DE DESIGN --------------------------- */
 :root {
-  /* Paleta principal */
+  
   --iris: #3a0ca3;
   --iris-deep: #26075f;
   --iris-soft: rgba(58, 12, 163, 0.08);
@@ -20,20 +8,16 @@
   --butter: #fff275;
   --butter-deep: #f2e14a;
 
-  /* Superfícies */
-  --page-bg: var(--butter);
+  --page-bg: var(--iris-deep);
   --paper: #fffdf3;
   --paper-alt: #fff9de;
 
-  /* Texto */
   --ink: #241245;
   --ink-soft: #6b5e8c;
   --ink-faint: #9187ab;
   --on-iris: #fbf9ff;
   --on-iris-soft: rgba(251, 249, 255, 0.68);
 
-  /* Cores de status — deliberadamente fora da paleta principal, para não
-     se misturarem nem com o fundo amarelo, nem com a capa violeta */
   --done: #1f9e6d;
   --done-soft: rgba(31, 158, 109, 0.12);
   --pending: #ff7d3d;
@@ -41,11 +25,9 @@
   --danger: #e13b5a;
   --danger-soft: rgba(225, 59, 90, 0.1);
 
-  /* Tipografia */
   --font-display: "Sora", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", sans-serif;
 
-  /* Layout */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
@@ -54,7 +36,6 @@
   --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ------------------------------ RESET BÁSICO ----------------------------- */
 * {
   box-sizing: border-box;
 }
