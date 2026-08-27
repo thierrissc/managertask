@@ -1,4 +1,14 @@
+/* =========================================================================
+   TASK MANAGER · STYLE.CSS
+   Tema: "graphite & violet" — fundo grafite profundo, tipografia geométrica
+   (Sora) para títulos, Inter para corpo, e um acento violeta/índigo que
+   percorre a interface como um "fio" de progresso (o elemento de assinatura
+   da página, ligado à taxa de conclusão das tarefas).
+   ========================================================================= */
+
+/* ---------------------------- TOKENS DE DESIGN --------------------------- */
 :root {
+  /* Cores base */
   --bg: #14151c;
   --bg-soft: #191b23;
   --surface: #1d1f29;
@@ -6,10 +16,12 @@
   --border: #2b2e3b;
   --border-soft: #24262f;
 
+  /* Texto */
   --text-primary: #edeef4;
   --text-secondary: #9195a8;
   --text-muted: #63667a;
 
+  /* Acentos */
   --accent: #7c6bff;
   --accent-strong: #9587ff;
   --accent-soft: rgba(124, 107, 255, 0.14);
@@ -20,9 +32,11 @@
   --danger: #ff6b81;
   --danger-soft: rgba(255, 107, 129, 0.12);
 
+  /* Tipografia */
   --font-display: "Sora", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", sans-serif;
 
+  /* Layout */
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
@@ -30,6 +44,7 @@
   --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ------------------------------ RESET BÁSICO ----------------------------- */
 * {
   box-sizing: border-box;
 }
@@ -77,6 +92,9 @@ ul {
   color: var(--text-primary);
 }
 
+/* --------------------------- BARRA DE PROGRESSO -------------------------- */
+/* Elemento de assinatura: um fio fino no topo da tela que se enche
+   conforme a taxa de conclusão das tarefas aumenta. */
 .progress-thread {
   position: fixed;
   top: 0;
@@ -88,12 +106,14 @@ ul {
   transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* --------------------------------- SHELL --------------------------------- */
 .app-shell {
   max-width: 880px;
   margin: 0 auto;
   padding: 40px 24px 80px;
 }
 
+/* -------------------------------- CABEÇALHO ------------------------------ */
 .app-header {
   display: flex;
   align-items: center;
@@ -160,9 +180,7 @@ ul {
   display: flex;
   align-items: center;
   gap: 12px;
-  transition:
-    transform var(--transition),
-    border-color var(--transition);
+  transition: transform var(--transition), border-color var(--transition);
 }
 
 .stat-card:hover {
@@ -250,9 +268,7 @@ ul {
   padding: 12px 14px;
   font-size: 14.5px;
   outline: none;
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 #taskForm input[type="text"]::placeholder {
@@ -280,9 +296,7 @@ ul {
   font-size: 14.5px;
   font-weight: 600;
   white-space: nowrap;
-  transition:
-    background var(--transition),
-    transform var(--transition);
+  transition: background var(--transition), transform var(--transition);
 }
 
 .btn-add svg {
@@ -336,9 +350,7 @@ ul {
   font-weight: 600;
   padding: 6px 14px;
   border-radius: 999px;
-  transition:
-    background var(--transition),
-    color var(--transition);
+  transition: background var(--transition), color var(--transition);
 }
 
 .filter-btn.is-active {
@@ -367,9 +379,7 @@ ul {
   border-radius: var(--radius-md);
   padding: 14px 16px;
   animation: card-in 320ms cubic-bezier(0.4, 0, 0.2, 1);
-  transition:
-    border-color var(--transition),
-    background var(--transition);
+  transition: border-color var(--transition), background var(--transition);
 }
 
 .task-card:hover {
@@ -498,9 +508,7 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background var(--transition),
-    color var(--transition);
+  transition: background var(--transition), color var(--transition);
 }
 
 .icon-btn svg {
@@ -557,6 +565,14 @@ ul {
   z-index: 200;
   padding: 20px;
   animation: overlay-in 160ms ease;
+}
+
+/* IMPORTANTE: sem esta regra, o `display: flex` acima vence o `display: none`
+   nativo do atributo [hidden], porque regras de autor têm prioridade sobre o
+   estilo padrão do navegador. Isso fazia os modais aparecerem sempre visíveis,
+   mesmo antes de qualquer clique. */
+.modal-overlay[hidden] {
+  display: none;
 }
 
 @keyframes overlay-in {
@@ -619,9 +635,7 @@ ul {
   font-size: 14px;
   outline: none;
   resize: vertical;
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .modal input:focus,
@@ -645,9 +659,7 @@ ul {
   padding: 10px 18px;
   font-size: 13.5px;
   font-weight: 600;
-  transition:
-    background var(--transition),
-    transform var(--transition);
+  transition: background var(--transition), transform var(--transition);
 }
 
 .btn-primary {

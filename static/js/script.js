@@ -1,6 +1,17 @@
+/* =============================================================================
+   TASK MANAGER · SCRIPT.JS
+   JavaScript puro (sem frameworks) responsável por:
+   - Buscar e renderizar as tarefas vindas da API Flask
+   - Adicionar, editar, excluir e concluir/desmarcar tarefas
+   - Atualizar o dashboard (cards + barra de progresso)
+   - Mostrar toasts de feedback e modais de edição/confirmação
+   Toda a comunicação com o backend é feita via fetch(), sem recarregar a página.
+   ============================================================================= */
+
 (() => {
   "use strict";
 
+  /* --------------------------- Referências do DOM ------------------------- */
   const taskForm = document.getElementById("taskForm");
   const tituloInput = document.getElementById("titulo");
   const descricaoInput = document.getElementById("descricao");
@@ -29,11 +40,15 @@
 
   const toastContainer = document.getElementById("toastContainer");
 
+  /* ------------------------------ Estado local ----------------------------- */
   let tarefas = [];
-  let filtroAtual = "todas";
+  let filtroAtual = "todas"; // "todas" | "pendentes" | "concluidas"
   let idParaEditar = null;
   let idParaExcluir = null;
 
+  /* ------------------------------------------------------------------------ */
+  /*  Inicialização                                                            */
+  /* ------------------------------------------------------------------------ */
   document.addEventListener("DOMContentLoaded", () => {
     exibirDataAtual();
     carregarTarefas();
@@ -45,6 +60,9 @@
     headerDate.textContent = hoje.toLocaleDateString("pt-BR", opcoes);
   }
 
+  /* ------------------------------------------------------------------------ */
+  /*  Comunicação com a API (fetch)                                            */
+  /* ------------------------------------------------------------------------ */
   async function carregarTarefas() {
     try {
       const resposta = await fetch("/api/tasks");
@@ -89,15 +107,15 @@
   }
 
   async function alternarConclusaoAPI(id) {
-    const resposta = await fetch(`/api/tasks/${id}/toggle`, {
-      method: "PATCH",
-    });
+    const resposta = await fetch(`/api/tasks/${id}/toggle`, { method: "PATCH" });
     const dados = await resposta.json();
-    if (!resposta.ok)
-      throw new Error(dados.erro || "Erro ao atualizar tarefa.");
+    if (!resposta.ok) throw new Error(dados.erro || "Erro ao atualizar tarefa.");
     return dados;
   }
 
+  /* ------------------------------------------------------------------------ */
+  /*  Formulário: adicionar tarefa                                             */
+  /* ------------------------------------------------------------------------ */
   taskForm.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
@@ -164,8 +182,8 @@
         filtroAtual === "todas"
           ? "Nenhuma tarefa por aqui ainda. Adicione a primeira acima."
           : filtroAtual === "pendentes"
-            ? "Nenhuma tarefa pendente. Bom trabalho!"
-            : "Nenhuma tarefa concluída ainda.";
+          ? "Nenhuma tarefa pendente. Bom trabalho!"
+          : "Nenhuma tarefa concluída ainda.";
       return;
     }
 
@@ -212,15 +230,9 @@
     `;
 
     // Eventos do card
-    li.querySelector(".task-checkbox").addEventListener("click", () =>
-      alternarConclusao(tarefa.id),
-    );
-    li.querySelector(".btn-edit").addEventListener("click", () =>
-      abrirModalEdicao(tarefa),
-    );
-    li.querySelector(".btn-delete").addEventListener("click", () =>
-      abrirModalConfirmacao(tarefa.id),
-    );
+    li.querySelector(".task-checkbox").addEventListener("click", () => alternarConclusao(tarefa.id));
+    li.querySelector(".btn-edit").addEventListener("click", () => abrirModalEdicao(tarefa));
+    li.querySelector(".btn-delete").addEventListener("click", () => abrirModalConfirmacao(tarefa.id));
 
     return li;
   }
@@ -255,10 +267,8 @@
     try {
       await alternarConclusaoAPI(id);
       mostrarToast(
-        tarefa.concluida
-          ? "Tarefa concluída!"
-          : "Tarefa marcada como pendente.",
-        "success",
+        tarefa.concluida ? "Tarefa concluída!" : "Tarefa marcada como pendente.",
+        "success"
       );
     } catch (erro) {
       // Reverte em caso de falha
@@ -302,11 +312,7 @@
     }
 
     try {
-      const tarefaAtualizada = await atualizarTarefa(
-        idParaEditar,
-        novoTitulo,
-        novaDescricao,
-      );
+      const tarefaAtualizada = await atualizarTarefa(idParaEditar, novoTitulo, novaDescricao);
       const indice = tarefas.findIndex((t) => t.id === idParaEditar);
       if (indice !== -1) tarefas[indice] = tarefaAtualizada;
 
