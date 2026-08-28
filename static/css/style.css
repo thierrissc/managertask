@@ -1,25 +1,10 @@
-/* =========================================================================
-   TASK MANAGER · STYLE.CSS
-   Conceito: "placar noturno" — fundo preto de verdade (não cinza-chumbo
-   genérico), com um masthead em Butter Yellow marcando a identidade e um
-   placar (scoreboard) com os números das tarefas, onde a cor de cada
-   número já denuncia o status (neutro / verde / laranja). A lista de
-   tarefas é um índice corrido, sem caixas empilhadas — cada linha é
-   separada por um fio fino, e o próprio checkbox carrega a cor do status
-   (laranja = pendente, verde = concluída), então nada mais precisa de
-   borda colorida.
-   ========================================================================= */
-
-/* ---------------------------- TOKENS DE DESIGN --------------------------- */
 :root {
-  /* Base preta — um preto "vivo", não o #000 chapado */
   --bg: #0b0a10;
   --bg-elevated: #17151f;
   --bg-elevated-2: #201d2c;
   --hairline: rgba(255, 242, 117, 0.12);
   --card-border: rgba(167, 159, 194, 0.22);
 
-  /* Paleta principal */
   --iris: #3a0ca3;
   --iris-bright: #7c3ff0;
   --iris-soft: rgba(122, 63, 240, 0.16);
@@ -27,7 +12,6 @@
   --butter: #fff275;
   --butter-dim: rgba(255, 242, 117, 0.7);
 
-  /* Texto */
   --text-primary: #f6f4fb;
   --text-secondary: #a79fc2;
   --text-muted: #6f6785;
@@ -39,11 +23,9 @@
   --danger: #ff5c72;
   --danger-soft: rgba(255, 92, 114, 0.12);
 
-  /* Tipografia */
   --font-display: "Sora", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", sans-serif;
 
-  /* Layout */
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -51,7 +33,6 @@
   --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ------------------------------ RESET BÁSICO ----------------------------- */
 * {
   box-sizing: border-box;
 }
@@ -99,14 +80,12 @@ ul {
   color: #fff;
 }
 
-/* --------------------------------- PAGE ---------------------------------- */
 .page {
   max-width: 720px;
   margin: 0 auto;
   padding: 48px 24px 80px;
 }
 
-/* ------------------------------- MASTHEAD -------------------------------- */
 .masthead {
   display: flex;
   align-items: center;
@@ -149,7 +128,6 @@ ul {
   white-space: nowrap;
 }
 
-/* --------------------------------- CALENDÁRIO ------------------------------ */
 .date-nav {
   position: relative;
 }
@@ -166,7 +144,9 @@ ul {
   padding: 9px 14px;
   border-radius: 999px;
   white-space: nowrap;
-  transition: border-color var(--transition), color var(--transition);
+  transition:
+    border-color var(--transition),
+    color var(--transition);
 }
 
 .date-trigger svg {
@@ -227,7 +207,9 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .calendar-nav-btn:hover {
@@ -266,7 +248,9 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .calendar-day:hover {
@@ -340,7 +324,6 @@ ul {
   background: var(--iris-soft);
 }
 
-/* Chip que aparece quando um dia específico está filtrando a lista */
 .date-filter-chip {
   display: inline-flex;
   align-items: center;
@@ -372,7 +355,6 @@ ul {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* ------------------------------- SCOREBOARD ------------------------------ */
 .scoreboard {
   display: flex;
   align-items: stretch;
@@ -421,7 +403,6 @@ ul {
   margin: 2px 8px;
 }
 
-/* ------------------------------ FORMULÁRIO ------------------------------- */
 .task-form-card {
   background: var(--bg-elevated);
   border: 1px solid var(--hairline);
@@ -444,7 +425,9 @@ ul {
   padding: 12px 14px;
   font-size: 14.5px;
   outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 
 #taskForm input[type="text"]::placeholder {
@@ -472,7 +455,9 @@ ul {
   font-size: 14.5px;
   font-weight: 700;
   white-space: nowrap;
-  transition: background var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
 
 .btn-add svg {
@@ -489,7 +474,6 @@ ul {
   transform: translateY(0);
 }
 
-/* --------------------------------- LISTA --------------------------------- */
 .task-list-section {
   margin-bottom: 16px;
 }
@@ -528,7 +512,9 @@ ul {
   font-weight: 700;
   padding: 6px 14px;
   border-radius: 999px;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .filter-btn.is-active {
@@ -540,15 +526,12 @@ ul {
   color: var(--text-primary);
 }
 
-/* Lista com espaçamento — cada item é um cartão com borda própria,
-   para se destacar claramente do fundo preto */
 .task-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* --------------------------------- LINHA ---------------------------------- */
 .task-row {
   display: flex;
   align-items: flex-start;
@@ -558,7 +541,10 @@ ul {
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
   animation: row-in 260ms cubic-bezier(0.4, 0, 0.2, 1);
-  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
 }
 
 .task-row:hover {
@@ -597,8 +583,6 @@ ul {
   }
 }
 
-/* Checkbox — carrega a cor do status: laranja quando pendente,
-   verde quando concluída. Não precisa de mais nada indicando isso. */
 .task-checkbox {
   flex-shrink: 0;
   width: 22px;
@@ -690,7 +674,9 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .icon-btn svg {
@@ -708,7 +694,6 @@ ul {
   color: var(--danger);
 }
 
-/* ------------------------------ ESTADO VAZIO ----------------------------- */
 .empty-state {
   text-align: center;
   padding: 48px 20px;
@@ -727,7 +712,6 @@ ul {
   margin: 0;
 }
 
-/* --------------------------------- FOOTER -------------------------------- */
 .app-footer {
   margin-top: 48px;
   color: var(--text-muted);
@@ -735,7 +719,6 @@ ul {
   text-align: center;
 }
 
-/* --------------------------------- MODAIS -------------------------------- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -749,10 +732,6 @@ ul {
   animation: overlay-in 160ms ease;
 }
 
-/* IMPORTANTE: sem esta regra, o `display: flex` acima venceria o
-   `display: none` nativo do atributo [hidden], porque regras de autor
-   têm prioridade sobre o estilo padrão do navegador — os modais ficariam
-   sempre visíveis mesmo antes de qualquer clique. */
 .modal-overlay[hidden] {
   display: none;
 }
@@ -819,7 +798,9 @@ ul {
   font-size: 14px;
   outline: none;
   resize: vertical;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
 
 .modal input:focus,
@@ -843,7 +824,9 @@ ul {
   padding: 10px 18px;
   font-size: 13.5px;
   font-weight: 700;
-  transition: background var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
 
 .btn-primary {
@@ -875,7 +858,6 @@ ul {
   background: #ff7a8c;
 }
 
-/* --------------------------------- TOASTS -------------------------------- */
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -940,7 +922,6 @@ ul {
   color: var(--danger);
 }
 
-/* ------------------------------- RESPONSIVO ------------------------------ */
 @media (max-width: 560px) {
   .page {
     padding: 32px 16px 60px;
@@ -993,7 +974,6 @@ ul {
   }
 }
 
-/* --------------------------- ACESSIBILIDADE / FOCO ------------------------ */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -1002,7 +982,6 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* Respeita a preferência do usuário por menos animação */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

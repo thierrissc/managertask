@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Task Manager - Backend Flask
 ==============================
@@ -23,11 +22,6 @@ from datetime import datetime
 
 from flask import Flask, jsonify, request, render_template
 
-# ---------------------------------------------------------------------------
-# Configuração de caminhos
-# ---------------------------------------------------------------------------
-# Como este arquivo fica dentro de /api, subimos um nível para encontrar
-# a raiz do projeto (onde estão /templates, /static e /data).
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -41,9 +35,6 @@ app = Flask(
 )
 
 
-# ---------------------------------------------------------------------------
-# Camada de "banco de dados" (arquivo JSON)
-# ---------------------------------------------------------------------------
 def _get_data_path():
     """
     Retorna o caminho do arquivo de dados a ser usado.
@@ -63,7 +54,6 @@ def _get_data_path():
     if os.environ.get("VERCEL"):
         tmp_file = "/tmp/tarefas.json"
         if not os.path.exists(tmp_file):
-            # Copia o conteúdo inicial (ou começa com lista vazia)
             conteudo_inicial = "[]"
             if os.path.exists(DATA_FILE):
                 with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -101,18 +91,12 @@ def proximo_id(tarefas):
     return max(tarefa["id"] for tarefa in tarefas) + 1
 
 
-# ---------------------------------------------------------------------------
-# Rota da página principal
-# ---------------------------------------------------------------------------
 @app.route("/")
 def index():
     """Renderiza a página principal (SPA simples com HTML + JS)."""
     return render_template("index.html")
 
 
-# ---------------------------------------------------------------------------
-# API - Listagem e criação
-# ---------------------------------------------------------------------------
 @app.route("/api/tasks", methods=["GET"])
 def listar_tarefas():
     """Retorna todas as tarefas cadastradas, da mais recente para a mais antiga."""
@@ -146,9 +130,6 @@ def criar_tarefa():
     return jsonify(nova_tarefa), 201
 
 
-# ---------------------------------------------------------------------------
-# API - Edição e exclusão de uma tarefa específica
-# ---------------------------------------------------------------------------
 @app.route("/api/tasks/<int:tarefa_id>", methods=["PUT"])
 def editar_tarefa(tarefa_id):
     """Atualiza o título e/ou a descrição de uma tarefa existente."""
@@ -198,9 +179,6 @@ def alternar_conclusao(tarefa_id):
     return jsonify(tarefa), 200
 
 
-# ---------------------------------------------------------------------------
-# API - Estatísticas para o dashboard
-# ---------------------------------------------------------------------------
 @app.route("/api/stats", methods=["GET"])
 def estatisticas():
     """Calcula e retorna os números exibidos nos cards do dashboard."""
@@ -210,18 +188,18 @@ def estatisticas():
     pendentes = total - concluidas
     taxa_conclusao = round((concluidas / total) * 100) if total > 0 else 0
 
-    return jsonify(
-        {
-            "total": total,
-            "concluidas": concluidas,
-            "pendentes": pendentes,
-            "taxa_conclusao": taxa_conclusao,
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "total": total,
+                "concluidas": concluidas,
+                "pendentes": pendentes,
+                "taxa_conclusao": taxa_conclusao,
+            }
+        ),
+        200,
+    )
 
 
-# ---------------------------------------------------------------------------
-# Execução local (não é usada pela Vercel, apenas em "python api/index.py")
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
