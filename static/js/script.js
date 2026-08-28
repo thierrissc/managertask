@@ -1,17 +1,6 @@
-/* =============================================================================
-   TASK MANAGER · SCRIPT.JS
-   JavaScript puro (sem frameworks) responsável por:
-   - Buscar e renderizar as tarefas vindas da API Flask
-   - Adicionar, editar, excluir e concluir/desmarcar tarefas
-   - Atualizar o resumo (total, concluídas, pendentes)
-   - Mostrar toasts de feedback e modais de edição/confirmação
-   Toda a comunicação com o backend é feita via fetch(), sem recarregar a página.
-   ============================================================================= */
-
 (() => {
   "use strict";
 
-  /* --------------------------- Referências do DOM ------------------------- */
   const taskForm = document.getElementById("taskForm");
   const tituloInput = document.getElementById("titulo");
   const descricaoInput = document.getElementById("descricao");
@@ -50,20 +39,16 @@
 
   const toastContainer = document.getElementById("toastContainer");
 
-  /* ------------------------------ Estado local ----------------------------- */
   let tarefas = [];
-  let filtroAtual = "todas"; // "todas" | "pendentes" | "concluidas"
+  let filtroAtual = "todas";
   let idParaEditar = null;
   let idParaExcluir = null;
-  let dataSelecionada = null; // "AAAA-MM-DD" quando o usuário filtra por um dia, ou null (sem filtro)
+  let dataSelecionada = null;
 
   const hoje = new Date();
   let mesExibidoAno = hoje.getFullYear();
-  let mesExibidoMes = hoje.getMonth(); // 0 = janeiro
+  let mesExibidoMes = hoje.getMonth();
 
-  /* ------------------------------------------------------------------------ */
-  /*  Inicialização                                                            */
-  /* ------------------------------------------------------------------------ */
   document.addEventListener("DOMContentLoaded", () => {
     atualizarHeaderDate();
     carregarTarefas();
@@ -74,14 +59,10 @@
   }
 
   function formatarDataISO(data) {
-    // Converte um objeto Date para "AAAA-MM-DD"
     return `${data.getFullYear()}-${pad(data.getMonth() + 1)}-${pad(data.getDate())}`;
   }
 
   function converterISOParaData(dataISO) {
-    // Cria o Date a partir das partes (ano, mês, dia) em vez de usar
-    // `new Date(string)`, que interpretaria como UTC e poderia mostrar o
-    // dia errado dependendo do fuso horário do navegador.
     const [ano, mes, dia] = dataISO.split("-").map(Number);
     return new Date(ano, mes - 1, dia);
   }
@@ -91,18 +72,15 @@
   }
 
   function atualizarHeaderDate() {
-    // Mostra a data selecionada no calendário, ou a data de hoje quando
-    // nenhum filtro está ativo.
-    const dataParaExibir = dataSelecionada ? converterISOParaData(dataSelecionada) : new Date();
+    const dataParaExibir = dataSelecionada
+      ? converterISOParaData(dataSelecionada)
+      : new Date();
     const opcoes = { weekday: "long", day: "numeric", month: "long" };
     headerDate.textContent = capitalizarPrimeiraLetra(
-      dataParaExibir.toLocaleDateString("pt-BR", opcoes)
+      dataParaExibir.toLocaleDateString("pt-BR", opcoes),
     );
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Comunicação com a API (fetch)                                            */
-  /* ------------------------------------------------------------------------ */
   async function carregarTarefas() {
     try {
       const resposta = await fetch("/api/tasks");
@@ -147,15 +125,15 @@
   }
 
   async function alternarConclusaoAPI(id) {
-    const resposta = await fetch(`/api/tasks/${id}/toggle`, { method: "PATCH" });
+    const resposta = await fetch(`/api/tasks/${id}/toggle`, {
+      method: "PATCH",
+    });
     const dados = await resposta.json();
-    if (!resposta.ok) throw new Error(dados.erro || "Erro ao atualizar tarefa.");
+    if (!resposta.ok)
+      throw new Error(dados.erro || "Erro ao atualizar tarefa.");
     return dados;
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Formulário: adicionar tarefa                                             */
-  /* ------------------------------------------------------------------------ */
   taskForm.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
@@ -182,12 +160,10 @@
     }
   });
 
-  /* ------------------------------------------------------------------------ */
-  /*  Calendário — abrir/fechar, navegar entre meses e selecionar um dia       */
-  /* ------------------------------------------------------------------------ */
   function abrirCalendario() {
-    // Sempre que abre, volta a exibir o mês da data em foco no momento
-    const referencia = dataSelecionada ? converterISOParaData(dataSelecionada) : new Date();
+    const referencia = dataSelecionada
+      ? converterISOParaData(dataSelecionada)
+      : new Date();
     mesExibidoAno = referencia.getFullYear();
     mesExibidoMes = referencia.getMonth();
 
@@ -206,14 +182,14 @@
     else fecharCalendario();
   });
 
-  // Fecha ao clicar fora do calendário
   document.addEventListener("click", (evento) => {
     if (calendarPopover.hidden) return;
-    const cliqueDentro = calendarPopover.contains(evento.target) || dateTrigger.contains(evento.target);
+    const cliqueDentro =
+      calendarPopover.contains(evento.target) ||
+      dateTrigger.contains(evento.target);
     if (!cliqueDentro) fecharCalendario();
   });
 
-  // Fecha com a tecla Esc
   document.addEventListener("keydown", (evento) => {
     if (evento.key === "Escape" && !calendarPopover.hidden) fecharCalendario();
   });
@@ -247,38 +223,58 @@
   btnClearDateChip.addEventListener("click", limparFiltroData);
 
   function diasComTarefas() {
-    // Conjunto com as datas ("AAAA-MM-DD") que já têm alguma tarefa,
-    // usado para desenhar o pontinho de indicação no calendário.
     return new Set(tarefas.map((t) => t.data_criacao));
   }
 
   function renderizarCalendario() {
-    const rotuloMes = new Date(mesExibidoAno, mesExibidoMes, 1).toLocaleDateString("pt-BR", {
+    const rotuloMes = new Date(
+      mesExibidoAno,
+      mesExibidoMes,
+      1,
+    ).toLocaleDateString("pt-BR", {
       month: "long",
       year: "numeric",
     });
     calMonthLabel.textContent = capitalizarPrimeiraLetra(rotuloMes);
 
-    const primeiroDiaSemana = new Date(mesExibidoAno, mesExibidoMes, 1).getDay(); // 0 = domingo
+    const primeiroDiaSemana = new Date(
+      mesExibidoAno,
+      mesExibidoMes,
+      1,
+    ).getDay();
     const diasNoMes = new Date(mesExibidoAno, mesExibidoMes + 1, 0).getDate();
-    const diasNoMesAnterior = new Date(mesExibidoAno, mesExibidoMes, 0).getDate();
+    const diasNoMesAnterior = new Date(
+      mesExibidoAno,
+      mesExibidoMes,
+      0,
+    ).getDate();
 
     const hojeISO = formatarDataISO(new Date());
     const marcados = diasComTarefas();
 
-    // Monta uma grade fixa de 42 células (6 semanas), preenchendo com os
-    // dias do mês anterior/seguinte quando necessário para alinhar as colunas
     const celulas = [];
     for (let i = 0; i < primeiroDiaSemana; i++) {
       const dia = diasNoMesAnterior - primeiroDiaSemana + i + 1;
-      celulas.push({ dia, fora: true, data: new Date(mesExibidoAno, mesExibidoMes - 1, dia) });
+      celulas.push({
+        dia,
+        fora: true,
+        data: new Date(mesExibidoAno, mesExibidoMes - 1, dia),
+      });
     }
     for (let dia = 1; dia <= diasNoMes; dia++) {
-      celulas.push({ dia, fora: false, data: new Date(mesExibidoAno, mesExibidoMes, dia) });
+      celulas.push({
+        dia,
+        fora: false,
+        data: new Date(mesExibidoAno, mesExibidoMes, dia),
+      });
     }
     let diaProximoMes = 1;
     while (celulas.length < 42) {
-      celulas.push({ dia: diaProximoMes, fora: true, data: new Date(mesExibidoAno, mesExibidoMes + 1, diaProximoMes) });
+      celulas.push({
+        dia: diaProximoMes,
+        fora: true,
+        data: new Date(mesExibidoAno, mesExibidoMes + 1, diaProximoMes),
+      });
       diaProximoMes++;
     }
 
@@ -324,9 +320,6 @@
     }
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Filtros (Todas / Pendentes / Concluídas)                                 */
-  /* ------------------------------------------------------------------------ */
   filterButtons.forEach((botao) => {
     botao.addEventListener("click", () => {
       filterButtons.forEach((b) => {
@@ -340,9 +333,6 @@
     });
   });
 
-  /* ------------------------------------------------------------------------ */
-  /*  Renderização                                                             */
-  /* ------------------------------------------------------------------------ */
   function renderizarTudo() {
     renderizarLista();
     renderizarDashboard();
@@ -352,9 +342,11 @@
     let lista = tarefas;
 
     if (filtroAtual === "pendentes") lista = lista.filter((t) => !t.concluida);
-    else if (filtroAtual === "concluidas") lista = lista.filter((t) => t.concluida);
+    else if (filtroAtual === "concluidas")
+      lista = lista.filter((t) => t.concluida);
 
-    if (dataSelecionada) lista = lista.filter((t) => t.data_criacao === dataSelecionada);
+    if (dataSelecionada)
+      lista = lista.filter((t) => t.data_criacao === dataSelecionada);
 
     return lista;
   }
@@ -372,8 +364,8 @@
           filtroAtual === "todas"
             ? "Nenhuma tarefa por aqui ainda. Adicione a primeira acima."
             : filtroAtual === "pendentes"
-            ? "Nenhuma tarefa pendente. Bom trabalho!"
-            : "Nenhuma tarefa concluída ainda.";
+              ? "Nenhuma tarefa pendente. Bom trabalho!"
+              : "Nenhuma tarefa concluída ainda.";
       }
       return;
     }
@@ -421,9 +413,15 @@
     `;
 
     // Eventos do card
-    li.querySelector(".task-checkbox").addEventListener("click", () => alternarConclusao(tarefa.id));
-    li.querySelector(".btn-edit").addEventListener("click", () => abrirModalEdicao(tarefa));
-    li.querySelector(".btn-delete").addEventListener("click", () => abrirModalConfirmacao(tarefa.id));
+    li.querySelector(".task-checkbox").addEventListener("click", () =>
+      alternarConclusao(tarefa.id),
+    );
+    li.querySelector(".btn-edit").addEventListener("click", () =>
+      abrirModalEdicao(tarefa),
+    );
+    li.querySelector(".btn-delete").addEventListener("click", () =>
+      abrirModalConfirmacao(tarefa.id),
+    );
 
     return li;
   }
@@ -438,12 +436,7 @@
     statPendentes.textContent = pendentes;
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Ações: concluir / desmarcar                                              */
-  /* ------------------------------------------------------------------------ */
   async function alternarConclusao(id) {
-    // Atualização otimista: muda a UI antes da resposta do servidor, para
-    // dar sensação de instantaneidade. Se der erro, revertemos.
     const tarefa = tarefas.find((t) => t.id === id);
     if (!tarefa) return;
 
@@ -453,20 +446,18 @@
     try {
       await alternarConclusaoAPI(id);
       mostrarToast(
-        tarefa.concluida ? "Tarefa concluída!" : "Tarefa marcada como pendente.",
-        "success"
+        tarefa.concluida
+          ? "Tarefa concluída!"
+          : "Tarefa marcada como pendente.",
+        "success",
       );
     } catch (erro) {
-      // Reverte em caso de falha
       tarefa.concluida = !tarefa.concluida;
       renderizarTudo();
       mostrarToast(erro.message, "error");
     }
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Modal de edição                                                          */
-  /* ------------------------------------------------------------------------ */
   function abrirModalEdicao(tarefa) {
     idParaEditar = tarefa.id;
     editTitulo.value = tarefa.titulo;
@@ -498,7 +489,11 @@
     }
 
     try {
-      const tarefaAtualizada = await atualizarTarefa(idParaEditar, novoTitulo, novaDescricao);
+      const tarefaAtualizada = await atualizarTarefa(
+        idParaEditar,
+        novoTitulo,
+        novaDescricao,
+      );
       const indice = tarefas.findIndex((t) => t.id === idParaEditar);
       if (indice !== -1) tarefas[indice] = tarefaAtualizada;
 
@@ -510,9 +505,6 @@
     }
   });
 
-  /* ------------------------------------------------------------------------ */
-  /*  Modal de confirmação de exclusão                                         */
-  /* ------------------------------------------------------------------------ */
   function abrirModalConfirmacao(id) {
     idParaExcluir = id;
     confirmModalOverlay.hidden = false;
@@ -536,7 +528,6 @@
     fecharModalConfirmacao();
 
     try {
-      // Animação de saída antes de remover do estado
       if (elementoCard) {
         elementoCard.classList.add("is-removing");
         await esperar(200);
@@ -552,9 +543,6 @@
     }
   });
 
-  /* ------------------------------------------------------------------------ */
-  /*  Toasts (mensagens de feedback)                                           */
-  /* ------------------------------------------------------------------------ */
   function mostrarToast(mensagem, tipo = "success") {
     const toast = document.createElement("div");
     toast.className = `toast${tipo === "error" ? " toast--error" : ""}`;
@@ -573,18 +561,13 @@
     }, 3200);
   }
 
-  /* ------------------------------------------------------------------------ */
-  /*  Utilitários                                                              */
-  /* ------------------------------------------------------------------------ */
   function formatarData(dataISO) {
-    // Recebe "AAAA-MM-DD" e devolve "DD/MM/AAAA"
     if (!dataISO) return "";
     const [ano, mes, dia] = dataISO.split("-");
     return `${dia}/${mes}/${ano}`;
   }
 
   function escapeHtml(texto) {
-    // Evita injeção de HTML ao renderizar título/descrição digitados pelo usuário
     const div = document.createElement("div");
     div.textContent = texto;
     return div.innerHTML;
