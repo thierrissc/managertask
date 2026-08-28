@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Task Manager · seu fluxo de tarefas, sem ruído</title>
   <meta name="description" content="Gerenciador de tarefas simples, moderno e responsivo." />
 
-  <!-- Favicon: badge butter yellow + check royal iris -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.svg') }}" />
-
-  <!-- Fontes: Sora para títulos, Inter para o corpo do texto -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+    rel="stylesheet" />
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+
 <body>
   <div class="page">
-
-    <!-- ===================== MASTHEAD ===================== -->
     <header class="masthead">
       <div class="mast-brand">
         <svg class="brand-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="8" y="8" width="84" height="84" rx="18" ry="18" fill="#FFF275"/>
-          <path d="M28 52 L44 68 L72 36" fill="none" stroke="#3A0CA3" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="8" y="8" width="84" height="84" rx="18" ry="18" fill="#FFF275" />
+          <path d="M28 52 L44 68 L72 36" fill="none" stroke="#3A0CA3" stroke-width="12" stroke-linecap="round"
+            stroke-linejoin="round" />
         </svg>
         <div class="mast-text">
           <h1>Task Manager</h1>
@@ -60,26 +57,16 @@
     <section class="task-form-card" aria-label="Adicionar nova tarefa">
       <form id="taskForm" autocomplete="off">
         <div class="form-row">
-          <input
-            type="text"
-            id="titulo"
-            name="titulo"
-            placeholder="O que você precisa fazer?"
-            maxlength="80"
-            required
-          />
+          <input type="text" id="titulo" name="titulo" placeholder="O que você precisa fazer?" maxlength="80"
+            required />
           <button type="submit" class="btn-add" id="btnAdd">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+            </svg>
             <span>Adicionar</span>
           </button>
         </div>
-        <input
-          type="text"
-          id="descricao"
-          name="descricao"
-          placeholder="Descrição (opcional)"
-          maxlength="200"
-        />
+        <input type="text" id="descricao" name="descricao" placeholder="Descrição (opcional)" maxlength="200" />
       </form>
     </section>
 
@@ -97,12 +84,16 @@
       <ul id="taskList" class="task-list"></ul>
 
       <div id="emptyState" class="empty-state" hidden>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6" />
+        </svg>
         <p id="emptyStateText">Nenhuma tarefa por aqui ainda. Adicione a primeira acima.</p>
       </div>
     </section>
 
-    <footer class="app-footer" justify-content="center" role="contentinfo">
+    <footer class="app-footer" justify-content="center">
       <p>Task Manager</p>
     </footer>
   </div>
@@ -138,9 +129,9 @@
     </div>
   </div>
 
-  <!-- Container de toasts (mensagens de feedback) -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>
