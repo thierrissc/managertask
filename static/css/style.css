@@ -32,12 +32,10 @@
   --text-secondary: #a79fc2;
   --text-muted: #6f6785;
 
-  /* Cores de status — fora da paleta principal, para não se confundirem
-     com o preto de fundo nem com o amarelo/violeta de marca */
   --done: #33d68f;
   --done-soft: rgba(51, 214, 143, 0.14);
-  --pending: #ff8a45;
-  --pending-soft: rgba(255, 138, 69, 0.16);
+  --pending: #e2d51f;
+  --pending-soft: rgba(226, 213, 31, 0.16);
   --danger: #ff5c72;
   --danger-soft: rgba(255, 92, 114, 0.12);
 
