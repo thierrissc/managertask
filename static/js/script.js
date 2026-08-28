@@ -26,6 +26,18 @@
 
   const filterButtons = document.querySelectorAll(".filter-btn");
 
+  const dateTrigger = document.getElementById("dateTrigger");
+  const calendarPopover = document.getElementById("calendarPopover");
+  const calPrevMonth = document.getElementById("calPrevMonth");
+  const calNextMonth = document.getElementById("calNextMonth");
+  const calMonthLabel = document.getElementById("calMonthLabel");
+  const calendarGrid = document.getElementById("calendarGrid");
+  const calToday = document.getElementById("calToday");
+  const calClear = document.getElementById("calClear");
+  const dateFilterChip = document.getElementById("dateFilterChip");
+  const dateFilterLabel = document.getElementById("dateFilterLabel");
+  const btnClearDateChip = document.getElementById("btnClearDateChip");
+
   const editModalOverlay = document.getElementById("editModalOverlay");
   const editForm = document.getElementById("editForm");
   const editTitulo = document.getElementById("editTitulo");
@@ -43,19 +55,49 @@
   let filtroAtual = "todas"; // "todas" | "pendentes" | "concluidas"
   let idParaEditar = null;
   let idParaExcluir = null;
+  let dataSelecionada = null; // "AAAA-MM-DD" quando o usuário filtra por um dia, ou null (sem filtro)
+
+  const hoje = new Date();
+  let mesExibidoAno = hoje.getFullYear();
+  let mesExibidoMes = hoje.getMonth(); // 0 = janeiro
 
   /* ------------------------------------------------------------------------ */
   /*  Inicialização                                                            */
   /* ------------------------------------------------------------------------ */
   document.addEventListener("DOMContentLoaded", () => {
-    exibirDataAtual();
+    atualizarHeaderDate();
     carregarTarefas();
   });
 
-  function exibirDataAtual() {
-    const hoje = new Date();
+  function pad(numero) {
+    return String(numero).padStart(2, "0");
+  }
+
+  function formatarDataISO(data) {
+    // Converte um objeto Date para "AAAA-MM-DD"
+    return `${data.getFullYear()}-${pad(data.getMonth() + 1)}-${pad(data.getDate())}`;
+  }
+
+  function converterISOParaData(dataISO) {
+    // Cria o Date a partir das partes (ano, mês, dia) em vez de usar
+    // `new Date(string)`, que interpretaria como UTC e poderia mostrar o
+    // dia errado dependendo do fuso horário do navegador.
+    const [ano, mes, dia] = dataISO.split("-").map(Number);
+    return new Date(ano, mes - 1, dia);
+  }
+
+  function capitalizarPrimeiraLetra(texto) {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+  }
+
+  function atualizarHeaderDate() {
+    // Mostra a data selecionada no calendário, ou a data de hoje quando
+    // nenhum filtro está ativo.
+    const dataParaExibir = dataSelecionada ? converterISOParaData(dataSelecionada) : new Date();
     const opcoes = { weekday: "long", day: "numeric", month: "long" };
-    headerDate.textContent = hoje.toLocaleDateString("pt-BR", opcoes);
+    headerDate.textContent = capitalizarPrimeiraLetra(
+      dataParaExibir.toLocaleDateString("pt-BR", opcoes)
+    );
   }
 
   /* ------------------------------------------------------------------------ */
@@ -141,6 +183,148 @@
   });
 
   /* ------------------------------------------------------------------------ */
+  /*  Calendário — abrir/fechar, navegar entre meses e selecionar um dia       */
+  /* ------------------------------------------------------------------------ */
+  function abrirCalendario() {
+    // Sempre que abre, volta a exibir o mês da data em foco no momento
+    const referencia = dataSelecionada ? converterISOParaData(dataSelecionada) : new Date();
+    mesExibidoAno = referencia.getFullYear();
+    mesExibidoMes = referencia.getMonth();
+
+    renderizarCalendario();
+    calendarPopover.hidden = false;
+    dateTrigger.setAttribute("aria-expanded", "true");
+  }
+
+  function fecharCalendario() {
+    calendarPopover.hidden = true;
+    dateTrigger.setAttribute("aria-expanded", "false");
+  }
+
+  dateTrigger.addEventListener("click", () => {
+    if (calendarPopover.hidden) abrirCalendario();
+    else fecharCalendario();
+  });
+
+  // Fecha ao clicar fora do calendário
+  document.addEventListener("click", (evento) => {
+    if (calendarPopover.hidden) return;
+    const cliqueDentro = calendarPopover.contains(evento.target) || dateTrigger.contains(evento.target);
+    if (!cliqueDentro) fecharCalendario();
+  });
+
+  // Fecha com a tecla Esc
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape" && !calendarPopover.hidden) fecharCalendario();
+  });
+
+  calPrevMonth.addEventListener("click", () => {
+    mesExibidoMes -= 1;
+    if (mesExibidoMes < 0) {
+      mesExibidoMes = 11;
+      mesExibidoAno -= 1;
+    }
+    renderizarCalendario();
+  });
+
+  calNextMonth.addEventListener("click", () => {
+    mesExibidoMes += 1;
+    if (mesExibidoMes > 11) {
+      mesExibidoMes = 0;
+      mesExibidoAno += 1;
+    }
+    renderizarCalendario();
+  });
+
+  calToday.addEventListener("click", () => {
+    const agora = new Date();
+    mesExibidoAno = agora.getFullYear();
+    mesExibidoMes = agora.getMonth();
+    selecionarData(formatarDataISO(agora));
+  });
+
+  calClear.addEventListener("click", limparFiltroData);
+  btnClearDateChip.addEventListener("click", limparFiltroData);
+
+  function diasComTarefas() {
+    // Conjunto com as datas ("AAAA-MM-DD") que já têm alguma tarefa,
+    // usado para desenhar o pontinho de indicação no calendário.
+    return new Set(tarefas.map((t) => t.data_criacao));
+  }
+
+  function renderizarCalendario() {
+    const rotuloMes = new Date(mesExibidoAno, mesExibidoMes, 1).toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+    });
+    calMonthLabel.textContent = capitalizarPrimeiraLetra(rotuloMes);
+
+    const primeiroDiaSemana = new Date(mesExibidoAno, mesExibidoMes, 1).getDay(); // 0 = domingo
+    const diasNoMes = new Date(mesExibidoAno, mesExibidoMes + 1, 0).getDate();
+    const diasNoMesAnterior = new Date(mesExibidoAno, mesExibidoMes, 0).getDate();
+
+    const hojeISO = formatarDataISO(new Date());
+    const marcados = diasComTarefas();
+
+    // Monta uma grade fixa de 42 células (6 semanas), preenchendo com os
+    // dias do mês anterior/seguinte quando necessário para alinhar as colunas
+    const celulas = [];
+    for (let i = 0; i < primeiroDiaSemana; i++) {
+      const dia = diasNoMesAnterior - primeiroDiaSemana + i + 1;
+      celulas.push({ dia, fora: true, data: new Date(mesExibidoAno, mesExibidoMes - 1, dia) });
+    }
+    for (let dia = 1; dia <= diasNoMes; dia++) {
+      celulas.push({ dia, fora: false, data: new Date(mesExibidoAno, mesExibidoMes, dia) });
+    }
+    let diaProximoMes = 1;
+    while (celulas.length < 42) {
+      celulas.push({ dia: diaProximoMes, fora: true, data: new Date(mesExibidoAno, mesExibidoMes + 1, diaProximoMes) });
+      diaProximoMes++;
+    }
+
+    calendarGrid.innerHTML = "";
+    celulas.forEach((celula) => {
+      const dataISO = formatarDataISO(celula.data);
+      const botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "calendar-day";
+      botao.textContent = celula.dia;
+
+      if (celula.fora) botao.classList.add("is-outside");
+      if (dataISO === hojeISO) botao.classList.add("is-today");
+      if (dataISO === dataSelecionada) botao.classList.add("is-selected");
+      if (marcados.has(dataISO)) botao.classList.add("has-tasks");
+
+      botao.addEventListener("click", () => selecionarData(dataISO));
+      calendarGrid.appendChild(botao);
+    });
+  }
+
+  function selecionarData(dataISO) {
+    dataSelecionada = dataISO;
+    fecharCalendario();
+    atualizarHeaderDate();
+    atualizarChipDeData();
+    renderizarLista();
+  }
+
+  function limparFiltroData() {
+    dataSelecionada = null;
+    atualizarHeaderDate();
+    atualizarChipDeData();
+    renderizarLista();
+  }
+
+  function atualizarChipDeData() {
+    const ativo = Boolean(dataSelecionada);
+    dateFilterChip.hidden = !ativo;
+    calClear.hidden = !ativo;
+    if (ativo) {
+      dateFilterLabel.textContent = `Tarefas de ${formatarData(dataSelecionada)}`;
+    }
+  }
+
+  /* ------------------------------------------------------------------------ */
   /*  Filtros (Todas / Pendentes / Concluídas)                                 */
   /* ------------------------------------------------------------------------ */
   filterButtons.forEach((botao) => {
@@ -165,9 +349,14 @@
   }
 
   function tarefasFiltradas() {
-    if (filtroAtual === "pendentes") return tarefas.filter((t) => !t.concluida);
-    if (filtroAtual === "concluidas") return tarefas.filter((t) => t.concluida);
-    return tarefas;
+    let lista = tarefas;
+
+    if (filtroAtual === "pendentes") lista = lista.filter((t) => !t.concluida);
+    else if (filtroAtual === "concluidas") lista = lista.filter((t) => t.concluida);
+
+    if (dataSelecionada) lista = lista.filter((t) => t.data_criacao === dataSelecionada);
+
+    return lista;
   }
 
   function renderizarLista() {
@@ -176,12 +365,16 @@
 
     if (lista.length === 0) {
       emptyState.hidden = false;
-      emptyStateText.textContent =
-        filtroAtual === "todas"
-          ? "Nenhuma tarefa por aqui ainda. Adicione a primeira acima."
-          : filtroAtual === "pendentes"
-          ? "Nenhuma tarefa pendente. Bom trabalho!"
-          : "Nenhuma tarefa concluída ainda.";
+      if (dataSelecionada) {
+        emptyStateText.textContent = `Nenhuma tarefa encontrada em ${formatarData(dataSelecionada)}.`;
+      } else {
+        emptyStateText.textContent =
+          filtroAtual === "todas"
+            ? "Nenhuma tarefa por aqui ainda. Adicione a primeira acima."
+            : filtroAtual === "pendentes"
+            ? "Nenhuma tarefa pendente. Bom trabalho!"
+            : "Nenhuma tarefa concluída ainda.";
+      }
       return;
     }
 
