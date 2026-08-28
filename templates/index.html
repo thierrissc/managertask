@@ -21,99 +21,90 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <div class="app-shell">
+  <div class="page">
 
-    <!-- ===================== PAINEL LATERAL (capa / ficha) ===================== -->
-    <aside class="side-panel">
-      <div class="brand">
+    <!-- ===================== MASTHEAD ===================== -->
+    <header class="masthead">
+      <div class="mast-brand">
         <svg class="brand-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect x="8" y="8" width="84" height="84" rx="18" ry="18" fill="#FFF275"/>
           <path d="M28 52 L44 68 L72 36" fill="none" stroke="#3A0CA3" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <div class="brand-text">
+        <div class="mast-text">
           <h1>Task Manager</h1>
           <p>seu fluxo de tarefas, sem ruído</p>
         </div>
       </div>
+      <div class="mast-date" id="headerDate"></div>
+    </header>
 
-      <nav class="ledger" aria-label="Resumo das tarefas">
-        <div class="ledger-row">
-          <strong id="statTotal">0</strong>
-          <span>Total de tarefas</span>
-        </div>
-        <div class="ledger-row">
-          <strong id="statConcluidas">0</strong>
-          <span>Concluídas</span>
-        </div>
-        <div class="ledger-row">
-          <strong id="statPendentes">0</strong>
-          <span>Pendentes</span>
-        </div>
-        <div class="ledger-row ledger-row--rate">
-          <span>Taxa de conclusão</span>
-          <strong id="statTaxa" class="rate-badge">0%</strong>
-        </div>
-      </nav>
-
-      <div class="side-footer">
-        <span id="headerDate"></span>
-        <p>Feito com Python, Flask e JS puro</p>
+    <!-- ===================== PLACAR (resumo) ===================== -->
+    <section class="scoreboard" aria-label="Resumo das tarefas">
+      <div class="score">
+        <strong id="statTotal">0</strong>
+        <span>Total</span>
       </div>
-    </aside>
+      <span class="score-divider" aria-hidden="true"></span>
+      <div class="score score--done">
+        <strong id="statConcluidas">0</strong>
+        <span>Concluídas</span>
+      </div>
+      <span class="score-divider" aria-hidden="true"></span>
+      <div class="score score--pending">
+        <strong id="statPendentes">0</strong>
+        <span>Pendentes</span>
+      </div>
+    </section>
 
-    <!-- ===================== CONTEÚDO PRINCIPAL ===================== -->
-    <main class="main-panel">
-
-      <!-- Formulário -->
-      <section class="task-form-card" aria-label="Adicionar nova tarefa">
-        <form id="taskForm" autocomplete="off">
-          <div class="form-row">
-            <input
-              type="text"
-              id="titulo"
-              name="titulo"
-              placeholder="O que você precisa fazer?"
-              maxlength="80"
-              required
-            />
-            <button type="submit" class="btn-add" id="btnAdd">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
-              <span>Adicionar</span>
-            </button>
-          </div>
+    <!-- ===================== FORMULÁRIO ===================== -->
+    <section class="task-form-card" aria-label="Adicionar nova tarefa">
+      <form id="taskForm" autocomplete="off">
+        <div class="form-row">
           <input
             type="text"
-            id="descricao"
-            name="descricao"
-            placeholder="Descrição (opcional)"
-            maxlength="200"
+            id="titulo"
+            name="titulo"
+            placeholder="O que você precisa fazer?"
+            maxlength="80"
+            required
           />
-        </form>
-      </section>
-
-      <!-- Lista de tarefas -->
-      <section class="task-list-section">
-        <div class="task-list-header">
-          <h2>Minhas tarefas</h2>
-          <div class="task-filters" role="tablist" aria-label="Filtrar tarefas">
-            <button class="filter-btn is-active" data-filter="todas" role="tab" aria-selected="true">Todas</button>
-            <button class="filter-btn" data-filter="pendentes" role="tab" aria-selected="false">Pendentes</button>
-            <button class="filter-btn" data-filter="concluidas" role="tab" aria-selected="false">Concluídas</button>
-          </div>
+          <button type="submit" class="btn-add" id="btnAdd">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+            <span>Adicionar</span>
+          </button>
         </div>
+        <input
+          type="text"
+          id="descricao"
+          name="descricao"
+          placeholder="Descrição (opcional)"
+          maxlength="200"
+        />
+      </form>
+    </section>
 
-        <ul id="taskList" class="task-list"></ul>
-
-        <div id="emptyState" class="empty-state" hidden>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6"/></svg>
-          <p id="emptyStateText">Nenhuma tarefa por aqui ainda. Adicione a primeira acima.</p>
+    <!-- ===================== LISTA DE TAREFAS ===================== -->
+    <section class="task-list-section">
+      <div class="task-list-header">
+        <h2>Minhas tarefas</h2>
+        <div class="task-filters" role="tablist" aria-label="Filtrar tarefas">
+          <button class="filter-btn is-active" data-filter="todas" role="tab" aria-selected="true">Todas</button>
+          <button class="filter-btn" data-filter="pendentes" role="tab" aria-selected="false">Pendentes</button>
+          <button class="filter-btn" data-filter="concluidas" role="tab" aria-selected="false">Concluídas</button>
         </div>
-      </section>
+      </div>
 
-      <footer class="app-footer">
-        <p>Task Manager · projeto de estudo e portfólio</p>
-      </footer>
-    </main>
+      <ul id="taskList" class="task-list"></ul>
+
+      <div id="emptyState" class="empty-state" hidden>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12.5l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="6" stroke="currentColor" stroke-width="1.6"/></svg>
+        <p id="emptyStateText">Nenhuma tarefa por aqui ainda. Adicione a primeira acima.</p>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Task Manager · projeto de estudo e portfólio</p>
+    </footer>
   </div>
 
   <!-- ===================== MODAL DE EDIÇÃO ===================== -->

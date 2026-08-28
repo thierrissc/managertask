@@ -3,7 +3,7 @@
    JavaScript puro (sem frameworks) responsável por:
    - Buscar e renderizar as tarefas vindas da API Flask
    - Adicionar, editar, excluir e concluir/desmarcar tarefas
-   - Atualizar o dashboard (cards + barra de progresso)
+   - Atualizar o resumo (total, concluídas, pendentes)
    - Mostrar toasts de feedback e modais de edição/confirmação
    Toda a comunicação com o backend é feita via fetch(), sem recarregar a página.
    ============================================================================= */
@@ -23,7 +23,6 @@
   const statTotal = document.getElementById("statTotal");
   const statConcluidas = document.getElementById("statConcluidas");
   const statPendentes = document.getElementById("statPendentes");
-  const statTaxa = document.getElementById("statTaxa");
 
   const filterButtons = document.querySelectorAll(".filter-btn");
 
@@ -195,29 +194,27 @@
 
   function criarElementoTarefa(tarefa) {
     const li = document.createElement("li");
-    li.className = `task-card${tarefa.concluida ? " is-done" : ""}`;
+    li.className = `task-row${tarefa.concluida ? " is-done" : ""}`;
     li.dataset.id = tarefa.id;
 
     li.innerHTML = `
-      <div class="task-main">
-        <button
-          class="task-checkbox${tarefa.concluida ? " is-checked" : ""}"
-          aria-label="${tarefa.concluida ? "Desmarcar conclusão" : "Marcar como concluída"}"
-          aria-pressed="${tarefa.concluida}"
-        >
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+      <button
+        class="task-checkbox${tarefa.concluida ? " is-checked" : ""}"
+        aria-label="${tarefa.concluida ? "Desmarcar conclusão" : "Marcar como concluída"}"
+        aria-pressed="${tarefa.concluida}"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
 
-        <div class="task-body">
-          <p class="task-title">${escapeHtml(tarefa.titulo)}</p>
-          ${tarefa.descricao ? `<p class="task-description">${escapeHtml(tarefa.descricao)}</p>` : ""}
-          <span class="task-date">
-            <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            ${formatarData(tarefa.data_criacao)}
-          </span>
-        </div>
+      <div class="task-body">
+        <p class="task-title">${escapeHtml(tarefa.titulo)}</p>
+        ${tarefa.descricao ? `<p class="task-description">${escapeHtml(tarefa.descricao)}</p>` : ""}
+        <span class="task-date">
+          <svg viewBox="0 0 24 24" fill="none" width="12" height="12"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          ${formatarData(tarefa.data_criacao)}
+        </span>
       </div>
 
       <div class="task-actions">
@@ -242,12 +239,10 @@
     const total = tarefas.length;
     const concluidas = tarefas.filter((t) => t.concluida).length;
     const pendentes = total - concluidas;
-    const taxa = total > 0 ? Math.round((concluidas / total) * 100) : 0;
 
     statTotal.textContent = total;
     statConcluidas.textContent = concluidas;
     statPendentes.textContent = pendentes;
-    statTaxa.textContent = `${taxa}%`;
   }
 
   /* ------------------------------------------------------------------------ */
