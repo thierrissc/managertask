@@ -133,8 +133,4 @@ Isso mantém o app 100% funcional (criar, editar, excluir e concluir tarefas) se
 
 
 
-
-
----
-
 Feito com 🐍 Python, 🌶️ Flask e JavaScript puro.
