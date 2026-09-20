@@ -78,6 +78,102 @@
   let mesExibidoAno = hoje.getFullYear();
   let mesExibidoMes = hoje.getMonth();
 
+  function initThreeBackground() {
+    const canvas = document.getElementById("threeCanvas");
+    if (!canvas || typeof THREE === "undefined") return;
+
+    try {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 14, 28);
+      camera.lookAt(0, 0, 0);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const rows = 35;
+      const cols = 60;
+      const count = rows * cols;
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+
+      const color1 = new THREE.Color("#6366f1");
+      const color2 = new THREE.Color("#ec4899");
+
+      let idx = 0;
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const x = (j - cols / 2) * 1.4;
+          const y = (i - rows / 2) * 1.3;
+          positions[idx * 3] = x;
+          positions[idx * 3 + 1] = 0;
+          positions[idx * 3 + 2] = y;
+
+          const ratio = (i / rows + j / cols) * 0.5;
+          const c = color1.clone().lerp(color2, ratio);
+          colors[idx * 3] = c.r;
+          colors[idx * 3 + 1] = c.g;
+          colors[idx * 3 + 2] = c.b;
+          idx++;
+        }
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 1.7,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+      });
+
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      let mouseX = 0;
+      let mouseY = 0;
+      window.addEventListener("mousemove", e => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 3;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 3;
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime() * 0.7;
+        const pos = geometry.attributes.position.array;
+
+        let pIdx = 0;
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            const x = pos[pIdx * 3];
+            const z = pos[pIdx * 3 + 2];
+            pos[pIdx * 3 + 1] = Math.sin(x * 0.16 + t) * 1.6 + Math.cos(z * 0.18 + t * 1.1) * 1.4;
+            pIdx++;
+          }
+        }
+        geometry.attributes.position.needsUpdate = true;
+
+        camera.position.x += (mouseX - camera.position.x) * 0.03;
+        camera.position.y += (14 - mouseY - camera.position.y) * 0.03;
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    } catch (e) {}
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     editModalOverlay.hidden = true;
     confirmModalOverlay.hidden = true;
@@ -85,6 +181,7 @@
     atualizarHeaderDate();
     carregarTarefas();
     configurarEventos();
+    initThreeBackground();
   });
 
   function tocarSomSucesso() {
@@ -274,18 +371,40 @@
         metaLine.appendChild(dueText);
       }
 
+      if (tarefa.descricao) {
+        item.classList.add("has-desc");
+      }
+
+      const titleRow = document.createElement("div");
+      titleRow.className = "task-title-row";
+
       const titleEl = document.createElement("h4");
       titleEl.className = "task-title";
       titleEl.textContent = tarefa.titulo;
-
-      content.appendChild(metaLine);
-      content.appendChild(titleEl);
+      titleRow.appendChild(titleEl);
 
       if (tarefa.descricao) {
-        const descEl = document.createElement("p");
-        descEl.className = "task-description";
-        descEl.textContent = tarefa.descricao;
-        content.appendChild(descEl);
+        const hint = document.createElement("span");
+        hint.className = "task-desc-hint";
+        hint.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
+        titleRow.appendChild(hint);
+      }
+
+      content.appendChild(metaLine);
+      content.appendChild(titleRow);
+
+      if (tarefa.descricao) {
+        const expandWrap = document.createElement("div");
+        expandWrap.className = "task-expanded-detail";
+        const descText = document.createElement("p");
+        descText.className = "task-desc-text";
+        descText.textContent = tarefa.descricao;
+        expandWrap.appendChild(descText);
+        content.appendChild(expandWrap);
+
+        content.addEventListener("click", () => {
+          item.classList.toggle("is-expanded");
+        });
       }
 
       const actions = document.createElement("div");
@@ -489,16 +608,15 @@
 
   function abrirModalEdicao(tarefa) {
     idParaEditar = tarefa.id;
-    editTitulo.value = tarefa.titulo;
-    editDescricao.value = tarefa.descricao || "";
-    editPrioridade.value = tarefa.prioridade || "media";
-    editCategoria.value = tarefa.categoria || "geral";
-    editDataVencimento.value = tarefa.data_vencimento || "";
+    if (editTitulo) editTitulo.value = tarefa.titulo || "";
+    if (editDescricao) editDescricao.value = tarefa.descricao || "";
+    if (editPrioridade) editPrioridade.value = tarefa.prioridade || "media";
+    if (editDataVencimento) editDataVencimento.value = tarefa.data_vencimento || "";
     subtarefasEdicao = JSON.parse(JSON.stringify(tarefa.subtarefas || []));
 
     renderizarModalSubtasks();
     editModalOverlay.hidden = false;
-    editTitulo.focus();
+    if (editTitulo) editTitulo.focus();
   }
 
   function fecharModalEdicao() {
@@ -534,15 +652,15 @@
   async function salvarEdicaoSubmit(e) {
     e.preventDefault();
     if (!idParaEditar) return;
-    const tit = editTitulo.value.trim();
+    const tit = editTitulo ? editTitulo.value.trim() : "";
     if (!tit) return;
 
     const payload = {
       titulo: tit,
-      descricao: editDescricao.value.trim(),
-      prioridade: editPrioridade.value,
-      categoria: editCategoria.value,
-      data_vencimento: editDataVencimento.value,
+      descricao: editDescricao ? editDescricao.value.trim() : "",
+      prioridade: editPrioridade ? editPrioridade.value : "media",
+      categoria: "geral",
+      data_vencimento: editDataVencimento ? editDataVencimento.value : "",
       subtarefas: subtarefasEdicao
     };
 
@@ -708,6 +826,20 @@
       aiPreviewBox.hidden = true;
       subtarefasCriacao = [];
     });
+
+    const btnToggleDesc = document.getElementById("btnToggleDesc");
+    const creatorDescWrap = document.getElementById("creatorDescWrap");
+    if (btnToggleDesc && creatorDescWrap) {
+      btnToggleDesc.addEventListener("click", () => {
+        const isHidden = creatorDescWrap.hidden;
+        creatorDescWrap.hidden = !isHidden;
+        btnToggleDesc.classList.toggle("is-active", isHidden);
+        if (isHidden) {
+          const inp = creatorDescWrap.querySelector("input");
+          if (inp) inp.focus();
+        }
+      });
+    }
 
     searchInput.addEventListener("input", e => {
       termoBusca = e.target.value;
