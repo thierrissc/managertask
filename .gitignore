@@ -17,3 +17,9 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.log
