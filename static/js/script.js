@@ -79,6 +79,9 @@
   let mesExibidoMes = hoje.getMonth();
 
   document.addEventListener("DOMContentLoaded", () => {
+    editModalOverlay.hidden = true;
+    confirmModalOverlay.hidden = true;
+    shortcutsModalOverlay.hidden = true;
     atualizarHeaderDate();
     carregarTarefas();
     configurarEventos();
@@ -806,11 +809,41 @@
     btnCancelDelete.addEventListener("click", fecharModalConfirmacao);
     btnConfirmDelete.addEventListener("click", confirmarExclusao);
 
-    btnOpenShortcuts.addEventListener("click", () => {
-      shortcutsModalOverlay.hidden = false;
+    const btnInfoShortcuts = document.getElementById("btnInfoShortcuts");
+    if (btnInfoShortcuts) {
+      btnInfoShortcuts.addEventListener("click", () => {
+        shortcutsModalOverlay.hidden = false;
+      });
+    }
+
+    if (btnOpenShortcuts) {
+      btnOpenShortcuts.addEventListener("click", () => {
+        shortcutsModalOverlay.hidden = false;
+      });
+    }
+
+    if (btnCloseShortcuts) {
+      btnCloseShortcuts.addEventListener("click", () => {
+        shortcutsModalOverlay.hidden = true;
+      });
+    }
+
+    shortcutsModalOverlay.addEventListener("click", e => {
+      if (e.target === shortcutsModalOverlay) {
+        shortcutsModalOverlay.hidden = true;
+      }
     });
-    btnCloseShortcuts.addEventListener("click", () => {
-      shortcutsModalOverlay.hidden = true;
+
+    editModalOverlay.addEventListener("click", e => {
+      if (e.target === editModalOverlay) {
+        fecharModalEdicao();
+      }
+    });
+
+    confirmModalOverlay.addEventListener("click", e => {
+      if (e.target === confirmModalOverlay) {
+        fecharModalConfirmacao();
+      }
     });
 
     document.addEventListener("keydown", e => {
