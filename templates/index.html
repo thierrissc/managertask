@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <div class="bg-gradient-mesh" aria-hidden="true"></div>
+  <canvas id="threeCanvas" class="three-canvas" aria-hidden="true"></canvas>
 
   <div class="page">
     <header class="masthead">
@@ -30,6 +30,7 @@
             <defs>
               <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="#6366f1" />
+                <stop offset="50%" stop-color="#8b5cf6" />
                 <stop offset="100%" stop-color="#ec4899" />
               </linearGradient>
             </defs>
@@ -90,6 +91,10 @@
           <button type="submit" class="btn-add-task" id="btnAdd">Adicionar</button>
         </div>
 
+        <div class="creator-desc-wrap" id="creatorDescWrap" hidden>
+          <input type="text" id="descricao" name="descricao" placeholder="Explicação ou notas adicionais (opcional)..." maxlength="250" />
+        </div>
+
         <div class="creator-options-bar">
           <div class="creator-options-left">
             <select id="prioridade" name="prioridade" title="Prioridade da tarefa">
@@ -98,13 +103,14 @@
               <option value="alta">Alta</option>
             </select>
             <input type="date" id="dataVencimento" name="dataVencimento" title="Prazo de entrega" />
+            <button type="button" class="btn-opt-pill" id="btnToggleDesc" title="Adicionar explicação">+ Nota</button>
           </div>
 
           <button type="button" class="btn-ai-magic" id="btnAiSuggest" title="Decompor tarefa com IA">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
             </svg>
-            <span>Sugerir com IA</span>
+            <span>IA</span>
           </button>
         </div>
 
@@ -125,7 +131,7 @@
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" id="searchInput" placeholder="Buscar tarefas... ( / )" />
+          <input type="text" id="searchInput" placeholder="Buscar tarefas..." />
         </div>
 
         <div class="status-tabs" role="tablist">
@@ -166,8 +172,8 @@
         </div>
 
         <div class="form-group">
-          <label for="editDescricao">Notas</label>
-          <textarea id="editDescricao" maxlength="250" rows="2"></textarea>
+          <label for="editDescricao">Explicação / Notas</label>
+          <textarea id="editDescricao" maxlength="250" rows="3"></textarea>
         </div>
 
         <div class="form-row-2">
@@ -238,13 +244,14 @@
         </div>
       </div>
       <div class="modal-footer-action">
-        <button type="button" class="btn-secondary" id="btnExportTasks" style="width:100%; margin-top:14px;">Exportar Backup (.json)</button>
+        <button type="button" class="btn-secondary" id="btnExportTasks" style="width:100%; margin-top:14px;">Exportar Backup</button>
       </div>
     </div>
   </div>
 
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
