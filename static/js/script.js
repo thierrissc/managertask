@@ -48,6 +48,19 @@
   const dateFilterLabel = document.getElementById("dateFilterLabel");
   const btnClearDateChip = document.getElementById("btnClearDateChip");
 
+  const createModalOverlay = document.getElementById("createModalOverlay");
+  const createModalForm = document.getElementById("createModalForm");
+  const createTitulo = document.getElementById("createTitulo");
+  const createDescricao = document.getElementById("createDescricao");
+  const createPrioridade = document.getElementById("createPrioridade");
+  const createDataVencimento = document.getElementById("createDataVencimento");
+  const btnCancelCreate = document.getElementById("btnCancelCreate");
+  const btnCloseCreateX = document.getElementById("btnCloseCreateX");
+  const createSubtasksList = document.getElementById("createSubtasksList");
+  const inputNewCreateSubtask = document.getElementById("inputNewCreateSubtask");
+  const btnAddCreateSubtaskItem = document.getElementById("btnAddCreateSubtaskItem");
+  const btnCreateAiBreakdown = document.getElementById("btnCreateAiBreakdown");
+
   const editModalOverlay = document.getElementById("editModalOverlay");
   const editForm = document.getElementById("editForm");
   const editTitulo = document.getElementById("editTitulo");
@@ -337,8 +350,9 @@
     emptyState.hidden = true;
 
     lista.forEach(tarefa => {
+      const prio = tarefa.prioridade || "media";
       const item = document.createElement("li");
-      item.className = `task-item ${tarefa.concluida ? "is-done" : ""}`;
+      item.className = `task-item prio-${prio} ${tarefa.concluida ? "is-done" : ""}`;
       item.dataset.id = tarefa.id;
 
       const mainRow = document.createElement("div");
@@ -350,26 +364,14 @@
       chk.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>`;
       chk.addEventListener("click", () => toggleTarefa(tarefa.id));
 
-      const content = document.createElement("div");
-      content.className = "task-content";
-
-      const prio = tarefa.prioridade || "media";
-      const dueInfo = formatarVencimentoLabel(tarefa.data_vencimento);
-
-      const metaLine = document.createElement("div");
-      metaLine.className = "task-meta-line";
-
       const prioDot = document.createElement("span");
       prioDot.className = `task-prio-dot task-prio-dot--${prio}`;
       prioDot.title = `Prioridade ${prio}`;
-      metaLine.appendChild(prioDot);
 
-      if (dueInfo && !tarefa.concluida) {
-        const dueText = document.createElement("span");
-        dueText.className = `task-due-text ${dueInfo.classe}`;
-        dueText.textContent = dueInfo.texto;
-        metaLine.appendChild(dueText);
-      }
+      const content = document.createElement("div");
+      content.className = "task-content";
+
+      const dueInfo = formatarVencimentoLabel(tarefa.data_vencimento);
 
       if (tarefa.descricao) {
         item.classList.add("has-desc");
@@ -383,6 +385,13 @@
       titleEl.textContent = tarefa.titulo;
       titleRow.appendChild(titleEl);
 
+      if (dueInfo && !tarefa.concluida) {
+        const dueBadge = document.createElement("span");
+        dueBadge.className = `task-due-badge ${dueInfo.classe}`;
+        dueBadge.textContent = dueInfo.texto;
+        titleRow.appendChild(dueBadge);
+      }
+
       if (tarefa.descricao) {
         const hint = document.createElement("span");
         hint.className = "task-desc-hint";
@@ -390,7 +399,6 @@
         titleRow.appendChild(hint);
       }
 
-      content.appendChild(metaLine);
       content.appendChild(titleRow);
 
       if (tarefa.descricao) {
@@ -415,19 +423,26 @@
       btnEdit.className = "icon-btn";
       btnEdit.title = "Editar tarefa";
       btnEdit.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
-      btnEdit.addEventListener("click", () => abrirModalEdicao(tarefa));
+      btnEdit.addEventListener("click", e => {
+        e.stopPropagation();
+        abrirModalEdicao(tarefa);
+      });
 
       const btnDel = document.createElement("button");
       btnDel.type = "button";
       btnDel.className = "icon-btn icon-btn--danger";
       btnDel.title = "Excluir tarefa";
       btnDel.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
-      btnDel.addEventListener("click", () => abrirModalConfirmacao(tarefa.id));
+      btnDel.addEventListener("click", e => {
+        e.stopPropagation();
+        abrirModalConfirmacao(tarefa.id);
+      });
 
       actions.appendChild(btnEdit);
       actions.appendChild(btnDel);
 
       mainRow.appendChild(chk);
+      mainRow.appendChild(prioDot);
       mainRow.appendChild(content);
       mainRow.appendChild(actions);
       item.appendChild(mainRow);
@@ -514,17 +529,80 @@
     }
   }
 
-  async function criarTarefaSubmit(e) {
-    e.preventDefault();
+  function abrirCriacaoPopupOuValidar(e) {
+    if (e) e.preventDefault();
     const titulo = tituloInput.value.trim();
-    if (!titulo) return;
+    if (!titulo) {
+      tituloInput.classList.add("input-invalid");
+      setTimeout(() => tituloInput.classList.remove("input-invalid"), 600);
+      mostrarToast("Por favor, preencha o que você precisa fazer.", "error");
+      tituloInput.focus();
+      return;
+    }
+    abrirModalCriacao(titulo);
+  }
+
+  function abrirModalCriacao(tituloInicial = "") {
+    if (createTitulo) createTitulo.value = tituloInicial;
+    if (createDescricao) createDescricao.value = "";
+    if (createPrioridade) createPrioridade.value = "media";
+    if (createDataVencimento) createDataVencimento.value = "";
+    renderizarCreateSubtasks();
+    if (createModalOverlay) {
+      createModalOverlay.hidden = false;
+      if (createTitulo) createTitulo.focus();
+    }
+  }
+
+  function fecharModalCriacao() {
+    if (createModalOverlay) createModalOverlay.hidden = true;
+    subtarefasCriacao = [];
+  }
+
+  function renderizarCreateSubtasks() {
+    if (!createSubtasksList) return;
+    createSubtasksList.innerHTML = "";
+    subtarefasCriacao.forEach((s, idx) => {
+      const li = document.createElement("li");
+      li.className = "subtask-single-row";
+      li.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" ${s.concluida ? "checked" : ""}>
+          <span style="${s.concluida ? "text-decoration:line-through;opacity:0.6" : ""}">${s.titulo}</span>
+        </div>
+        <button type="button" class="btn-del-subtask" aria-label="Remover subtarefa">✕</button>
+      `;
+      li.querySelector("input").addEventListener("change", e => {
+        s.concluida = e.target.checked;
+        renderizarCreateSubtasks();
+      });
+      li.querySelector(".btn-del-subtask").addEventListener("click", () => {
+        subtarefasCriacao.splice(idx, 1);
+        renderizarCreateSubtasks();
+      });
+      createSubtasksList.appendChild(li);
+    });
+  }
+
+  async function salvarCriacaoModalSubmit(e) {
+    if (e) e.preventDefault();
+    const tit = createTitulo ? createTitulo.value.trim() : "";
+    if (!tit) {
+      if (createTitulo) {
+        createTitulo.classList.add("input-invalid");
+        setTimeout(() => createTitulo.classList.remove("input-invalid"), 600);
+        createTitulo.focus();
+      }
+      mostrarToast("Por favor, preencha o título da tarefa.", "error");
+      return;
+    }
 
     const payload = {
-      titulo,
-      descricao: descricaoInput ? descricaoInput.value.trim() : "",
-      prioridade: prioridadeSelect ? prioridadeSelect.value : "media",
-      categoria: categoriaSelect ? categoriaSelect.value : "geral",
-      data_vencimento: dataVencimentoInput ? dataVencimentoInput.value : "",
+      titulo: tit,
+      descricao: createDescricao ? createDescricao.value.trim() : "",
+      prioridade: createPrioridade ? createPrioridade.value : "media",
+      categoria: "geral",
+      data_vencimento: createDataVencimento ? createDataVencimento.value : "",
       subtarefas: subtarefasCriacao
     };
 
@@ -537,9 +615,8 @@
       if (!resp.ok) throw new Error();
       const nova = await resp.json();
       tarefas.unshift(nova);
-      taskForm.reset();
-      subtarefasCriacao = [];
-      aiPreviewBox.hidden = true;
+      fecharModalCriacao();
+      if (taskForm) taskForm.reset();
       renderizarTudo();
       mostrarToast("Tarefa adicionada com sucesso!", "success");
     } catch (err) {
@@ -547,10 +624,54 @@
     }
   }
 
+  async function quebrarCriacaoModalComIA() {
+    const tit = createTitulo ? createTitulo.value.trim() : "";
+    if (!tit) {
+      if (createTitulo) {
+        createTitulo.classList.add("input-invalid");
+        setTimeout(() => createTitulo.classList.remove("input-invalid"), 600);
+        createTitulo.focus();
+      }
+      mostrarToast("Por favor, informe o título para a IA sugerir etapas.", "info");
+      return;
+    }
+
+    if (btnCreateAiBreakdown) btnCreateAiBreakdown.disabled = true;
+    mostrarToast("Assistente de IA analisando a tarefa...", "info");
+
+    try {
+      const resp = await fetch("/api/ai/breakdown", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo: tit,
+          descricao: createDescricao ? createDescricao.value.trim() : ""
+        })
+      });
+      if (!resp.ok) throw new Error();
+      const data = await resp.json();
+      (data.subtarefas || []).forEach(subT => {
+        subtarefasCriacao.push({
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          titulo: subT,
+          concluida: false
+        });
+      });
+      renderizarCreateSubtasks();
+      mostrarToast("Checklist atualizado com sugestões da IA!", "success");
+    } catch (err) {
+      mostrarToast("Falha na consulta de IA.", "error");
+    } finally {
+      if (btnCreateAiBreakdown) btnCreateAiBreakdown.disabled = false;
+    }
+  }
+
   async function quebrarComIA() {
     const tit = tituloInput.value.trim();
     if (!tit) {
-      mostrarToast("Digite o título da tarefa para quebrar com IA.", "info");
+      tituloInput.classList.add("input-invalid");
+      setTimeout(() => tituloInput.classList.remove("input-invalid"), 600);
+      mostrarToast("Por favor, preencha o que você precisa fazer.", "error");
       tituloInput.focus();
       return;
     }
@@ -563,47 +684,26 @@
       const resp = await fetch("/api/ai/breakdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo: tit, descricao: descricaoInput ? descricaoInput.value.trim() : "" })
+        body: JSON.stringify({ titulo: tit, descricao: "" })
       });
       if (!resp.ok) throw new Error();
       const data = await resp.json();
       const itens = data.subtarefas || [];
 
-      if (itens.length === 0) {
-        mostrarToast("Nenhuma subtarefa gerada.", "info");
-        return;
-      }
+      subtarefasCriacao = itens.map(t => ({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        titulo: t,
+        concluida: false
+      }));
 
-      subtarefasCriacao = itens.map(t => ({ titulo: t, concluida: false }));
-      renderizarAiPreview();
-      aiPreviewBox.hidden = false;
-      mostrarToast(`${itens.length} subtarefas sugeridas!`, "success");
+      abrirModalCriacao(tit);
+      mostrarToast(`${itens.length} subtarefas sugeridas pela IA!`, "success");
     } catch (err) {
       mostrarToast("Falha na consulta de IA.", "error");
     } finally {
       btnAiSuggest.disabled = false;
       btnAiSuggest.style.opacity = "1";
     }
-  }
-
-  function renderizarAiPreview() {
-    aiSubtasksList.innerHTML = "";
-    subtarefasCriacao.forEach((sub, i) => {
-      const li = document.createElement("li");
-      li.className = "ai-subtask-item";
-      li.innerHTML = `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" checked data-index="${i}"> <span>${sub.titulo}</span></label>`;
-      aiSubtasksList.appendChild(li);
-    });
-
-    aiSubtasksList.querySelectorAll("input").forEach(inp => {
-      inp.addEventListener("change", e => {
-        const idx = Number(e.target.dataset.index);
-        if (!e.target.checked) {
-          subtarefasCriacao.splice(idx, 1);
-          renderizarAiPreview();
-        }
-      });
-    });
   }
 
   function abrirModalEdicao(tarefa) {
@@ -653,7 +753,15 @@
     e.preventDefault();
     if (!idParaEditar) return;
     const tit = editTitulo ? editTitulo.value.trim() : "";
-    if (!tit) return;
+    if (!tit) {
+      if (editTitulo) {
+        editTitulo.classList.add("input-invalid");
+        setTimeout(() => editTitulo.classList.remove("input-invalid"), 600);
+        editTitulo.focus();
+      }
+      mostrarToast("Por favor, preencha o título da tarefa.", "error");
+      return;
+    }
 
     const payload = {
       titulo: tit,
@@ -820,12 +928,48 @@
   }
 
   function configurarEventos() {
-    taskForm.addEventListener("submit", criarTarefaSubmit);
+    taskForm.addEventListener("submit", abrirCriacaoPopupOuValidar);
     btnAiSuggest.addEventListener("click", quebrarComIA);
-    btnCloseAiPreview.addEventListener("click", () => {
-      aiPreviewBox.hidden = true;
-      subtarefasCriacao = [];
-    });
+    if (btnCloseAiPreview && aiPreviewBox) {
+      btnCloseAiPreview.addEventListener("click", () => {
+        aiPreviewBox.hidden = true;
+        subtarefasCriacao = [];
+      });
+    }
+
+    if (createModalForm) {
+      createModalForm.addEventListener("submit", salvarCriacaoModalSubmit);
+    }
+    if (btnCancelCreate) {
+      btnCancelCreate.addEventListener("click", fecharModalCriacao);
+    }
+    if (btnCloseCreateX) {
+      btnCloseCreateX.addEventListener("click", fecharModalCriacao);
+    }
+    if (btnAddCreateSubtaskItem && inputNewCreateSubtask) {
+      const addCreateItem = () => {
+        const val = inputNewCreateSubtask.value.trim();
+        if (!val) return;
+        subtarefasCriacao.push({ id: Date.now(), titulo: val, concluida: false });
+        inputNewCreateSubtask.value = "";
+        renderizarCreateSubtasks();
+      };
+      btnAddCreateSubtaskItem.addEventListener("click", addCreateItem);
+      inputNewCreateSubtask.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addCreateItem();
+        }
+      });
+    }
+    if (btnCreateAiBreakdown) {
+      btnCreateAiBreakdown.addEventListener("click", quebrarCriacaoModalComIA);
+    }
+    if (createModalOverlay) {
+      createModalOverlay.addEventListener("click", e => {
+        if (e.target === createModalOverlay) fecharModalCriacao();
+      });
+    }
 
     const btnToggleDesc = document.getElementById("btnToggleDesc");
     const creatorDescWrap = document.getElementById("creatorDescWrap");
@@ -983,6 +1127,7 @@
       if (e.key === "Escape") {
         calendarPopover.hidden = true;
         dateTrigger.setAttribute("aria-expanded", "false");
+        fecharModalCriacao();
         fecharModalEdicao();
         fecharModalConfirmacao();
         shortcutsModalOverlay.hidden = true;
