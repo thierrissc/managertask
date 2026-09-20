@@ -85,41 +85,16 @@
     </section>
 
     <section class="task-creator-card" aria-label="Adicionar tarefa">
-      <form id="taskForm" autocomplete="off">
+      <form id="taskForm" autocomplete="off" novalidate>
         <div class="creator-input-wrap">
-          <input type="text" id="titulo" name="titulo" placeholder="O que você precisa fazer?" maxlength="100" required />
-          <button type="submit" class="btn-add-task" id="btnAdd">Adicionar</button>
-        </div>
-
-        <div class="creator-desc-wrap" id="creatorDescWrap" hidden>
-          <input type="text" id="descricao" name="descricao" placeholder="Explicação ou notas adicionais (opcional)..." maxlength="250" />
-        </div>
-
-        <div class="creator-options-bar">
-          <div class="creator-options-left">
-            <select id="prioridade" name="prioridade" title="Prioridade da tarefa">
-              <option value="baixa">Baixa</option>
-              <option value="media" selected>Média</option>
-              <option value="alta">Alta</option>
-            </select>
-            <input type="date" id="dataVencimento" name="dataVencimento" title="Prazo de entrega" />
-            <button type="button" class="btn-opt-pill" id="btnToggleDesc" title="Adicionar explicação">+ Nota</button>
-          </div>
-
-          <button type="button" class="btn-ai-magic" id="btnAiSuggest" title="Decompor tarefa com IA">
+          <input type="text" id="titulo" name="titulo" placeholder="O que você precisa fazer?" maxlength="100" />
+          <button type="button" class="btn-ai-action" id="btnAiSuggest" title="Criar ou quebrar tarefa com IA">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
             </svg>
             <span>IA</span>
           </button>
-        </div>
-
-        <div class="ai-preview-box" id="aiPreviewBox" hidden>
-          <div class="ai-preview-header">
-            <strong>Subtarefas sugeridas pela IA:</strong>
-            <button type="button" class="btn-text-sm" id="btnCloseAiPreview">Descartar</button>
-          </div>
-          <ul class="ai-subtasks-list" id="aiSubtasksList"></ul>
+          <button type="submit" class="btn-add-task" id="btnAdd">Adicionar</button>
         </div>
       </form>
     </section>
@@ -154,8 +129,62 @@
     </section>
 
     <footer class="app-footer">
-      <p>Task Manager</p>
+      <p>Task Manager · Foco, clareza e produtividade diária</p>
     </footer>
+  </div>
+
+  <div class="modal-overlay" id="createModalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
+      <div class="modal-header">
+        <h3 id="createModalTitle">Nova Tarefa</h3>
+        <button type="button" class="btn-close-modal" id="btnCloseCreateX">✕</button>
+      </div>
+
+      <form id="createModalForm" novalidate>
+        <div class="form-group">
+          <label for="createTitulo">Título</label>
+          <input type="text" id="createTitulo" maxlength="100" required />
+        </div>
+
+        <div class="form-group">
+          <label for="createDescricao">Explicação / Notas</label>
+          <textarea id="createDescricao" maxlength="250" rows="3" placeholder="Adicione notas ou explicação (opcional)..."></textarea>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="createPrioridade">Prioridade</label>
+            <select id="createPrioridade">
+              <option value="baixa">Baixa</option>
+              <option value="media" selected>Média</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="createDataVencimento">Prazo</label>
+            <input type="date" id="createDataVencimento" />
+          </div>
+        </div>
+
+        <div class="modal-subtasks-section">
+          <div class="modal-subtasks-title">
+            <span>Checklist</span>
+            <button type="button" class="btn-text-ai" id="btnCreateAiBreakdown">Sugerir com IA</button>
+          </div>
+          <div class="add-subtask-row">
+            <input type="text" id="inputNewCreateSubtask" placeholder="Novo item..." maxlength="80" />
+            <button type="button" class="btn-subtle" id="btnAddCreateSubtaskItem">Adicionar</button>
+          </div>
+          <ul class="modal-subtasks-list" id="createSubtasksList"></ul>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btnCancelCreate">Cancelar</button>
+          <button type="submit" class="btn-primary">Criar Tarefa</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="modal-overlay" id="editModalOverlay" hidden>
@@ -165,7 +194,7 @@
         <button type="button" class="btn-close-modal" id="btnCloseEditX">✕</button>
       </div>
 
-      <form id="editForm">
+      <form id="editForm" novalidate>
         <div class="form-group">
           <label for="editTitulo">Título</label>
           <input type="text" id="editTitulo" maxlength="100" required />
