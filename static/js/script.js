@@ -256,35 +256,29 @@
       const content = document.createElement("div");
       content.className = "task-content";
 
-      const headerRow = document.createElement("div");
-      headerRow.className = "task-header-row";
-
       const prio = tarefa.prioridade || "media";
-      const prioBadge = document.createElement("span");
-      prioBadge.className = `badge-priority badge-priority--${prio}`;
-      prioBadge.textContent = prio;
-      headerRow.appendChild(prioBadge);
-
-      if (tarefa.categoria) {
-        const catBadge = document.createElement("span");
-        catBadge.className = "badge-category";
-        catBadge.textContent = tarefa.categoria;
-        headerRow.appendChild(catBadge);
-      }
-
       const dueInfo = formatarVencimentoLabel(tarefa.data_vencimento);
+
+      const metaLine = document.createElement("div");
+      metaLine.className = "task-meta-line";
+
+      const prioDot = document.createElement("span");
+      prioDot.className = `task-prio-dot task-prio-dot--${prio}`;
+      prioDot.title = `Prioridade ${prio}`;
+      metaLine.appendChild(prioDot);
+
       if (dueInfo && !tarefa.concluida) {
-        const dueBadge = document.createElement("span");
-        dueBadge.className = `badge-due ${dueInfo.classe}`;
-        dueBadge.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${dueInfo.texto}`;
-        headerRow.appendChild(dueBadge);
+        const dueText = document.createElement("span");
+        dueText.className = `task-due-text ${dueInfo.classe}`;
+        dueText.textContent = dueInfo.texto;
+        metaLine.appendChild(dueText);
       }
 
       const titleEl = document.createElement("h4");
       titleEl.className = "task-title";
       titleEl.textContent = tarefa.titulo;
 
-      content.appendChild(headerRow);
+      content.appendChild(metaLine);
       content.appendChild(titleEl);
 
       if (tarefa.descricao) {
@@ -408,10 +402,10 @@
 
     const payload = {
       titulo,
-      descricao: descricaoInput.value.trim(),
-      prioridade: prioridadeSelect.value,
-      categoria: categoriaSelect.value,
-      data_vencimento: dataVencimentoInput.value,
+      descricao: descricaoInput ? descricaoInput.value.trim() : "",
+      prioridade: prioridadeSelect ? prioridadeSelect.value : "media",
+      categoria: categoriaSelect ? categoriaSelect.value : "geral",
+      data_vencimento: dataVencimentoInput ? dataVencimentoInput.value : "",
       subtarefas: subtarefasCriacao
     };
 
@@ -450,7 +444,7 @@
       const resp = await fetch("/api/ai/breakdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo: tit, descricao: descricaoInput.value.trim() })
+        body: JSON.stringify({ titulo: tit, descricao: descricaoInput ? descricaoInput.value.trim() : "" })
       });
       if (!resp.ok) throw new Error();
       const data = await resp.json();
@@ -720,10 +714,12 @@
       renderizarLista();
     });
 
-    sortSelect.addEventListener("change", e => {
-      ordenacao = e.target.value;
-      renderizarLista();
-    });
+    if (sortSelect) {
+      sortSelect.addEventListener("change", e => {
+        ordenacao = e.target.value;
+        renderizarLista();
+      });
+    }
 
     document.querySelectorAll(".filter-tab").forEach(tab => {
       tab.addEventListener("click", () => {
@@ -743,8 +739,13 @@
       });
     });
 
-    btnClearCompleted.addEventListener("click", limparConcluidas);
-    btnExportTasks.addEventListener("click", exportarTarefas);
+    if (btnClearCompleted) {
+      btnClearCompleted.addEventListener("click", limparConcluidas);
+    }
+    const exportBtn = document.getElementById("btnExportTasks");
+    if (exportBtn) {
+      exportBtn.addEventListener("click", exportarTarefas);
+    }
 
     dateTrigger.addEventListener("click", () => {
       const open = calendarPopover.hidden;
