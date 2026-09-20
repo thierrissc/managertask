@@ -1,136 +1,120 @@
-# Task Manager
+# Task Manager PRO
 
-Um gerenciador de tarefas web simples, moderno e responsivo — construído com **Python + Flask** no backend e **HTML, CSS e JavaScript puro** no frontend, usando um **arquivo JSON** como armazenamento. Projeto pensado para estudo e portfólio, sem banco de dados, sem Docker e sem bibliotecas externas desnecessárias.
+Um gerenciador de tarefas web moderno, inteligente e de alta performance — construído com **Python + Flask** modular no backend e **HTML5, CSS3 avançado com gradientes animados e JavaScript puro** no frontend, usando persistência em JSON e integração segura com IA via servidor.
 
-![status](https://img.shields.io/badge/status-pronto%20para%20uso-7c6bff)
-![python](https://img.shields.io/badge/python-3.x-2fd4a5)
-![flask](https://img.shields.io/badge/flask-3.x-7c6bff)
+![status](https://img.shields.io/badge/status-pronto%20para%20uso-6366f1)
+![python](https://img.shields.io/badge/python-3.x-10b981)
+![flask](https://img.shields.io/badge/flask-3.x-8b5cf6)
 
+---
 
-##  Descrição
+## Destaques & Funcionalidades
 
-O **Task Manager** permite criar, editar, concluir e excluir tarefas através de uma interface escura, minimalista e inspirada em ferramentas como Todoist, Notion e Trello. Todas as ações acontecem sem recarregar a página (via `fetch`), com feedback visual em tempo real: toasts de sucesso/erro, modais de confirmação e um dashboard com estatísticas.
+- **Design System Moderno**:
+  - Tema escuro profundo com malha de iluminação indireta (`radial-gradient`).
+  - Gradientes animados fluidos em botões de ação e barras de progresso.
+  - Efeitos de glassmorphism e micro-interações táteis.
+- **Prioridades & Categorias**:
+  - Níveis de prioridade (*Alta*, *Média*, *Baixa*) com badges coloridos.
+  - Categorias / Tags inteligentes (*Trabalho*, *Pessoal*, *Estudos*, *Urgente*, *Ideias*).
+- **Prazos & Datas de Vencimento**:
+  - Alerta inteligente de tarefas no prazo, hoje, amanhã ou atrasadas.
+  - Mini calendário interativo para navegação e filtro por dia.
+- **Subtarefas & Checklist**:
+  - Adição e acompanhamento de subtarefas dentro de cada tarefa com contagem e progresso.
+- **Assistente com IA (Server-Side Proxy)**:
+  - Quebra automática de tarefas em subtarefas práticas com inteligência artificial.
+  - A chave da API Gemini é configurada estritamente no backend (`.env`), nunca sendo exposta ao navegador do cliente. Possui fallback inteligente caso nenhuma chave esteja configurada.
+- **Busca em Tempo Real & Atalhos de Teclado**:
+  - Barra de busca instantânea por título, descrição ou categoria.
+  - Atalhos: `N` para nova tarefa, `/` para pesquisar e `Esc` para fechar modais.
+- **Áudio & Feedback Tátil**:
+  - Efeito sonoro suave gerado nativamente via Web Audio API ao concluir tarefas.
+- **Ações em Massa & Backup**:
+  - Remoção em lote de tarefas concluídas.
+  - Exportação de dados em arquivo `.json`.
 
-### Funcionalidades
+---
 
--  Adicionar tarefa (título + descrição opcional)
--  Editar tarefa (modal dedicado)
--  Excluir tarefa (com confirmação)
--  Marcar/desmarcar conclusão
--  Dashboard com total, concluídas, pendentes e taxa de conclusão
--  Filtros: todas / pendentes / concluídas
--  Toasts de feedback e animações suaves
--  Totalmente responsivo (mobile e desktop)
-
-
-## 🛠️ Tecnologias
-
-| Camada        | Tecnologia                          |
-|---------------|--------------------------------------|
-| Backend       | Python 3, Flask                      |
-| Frontend      | HTML5, CSS3, JavaScript (vanilla)    |
-| Armazenamento | Arquivo JSON (`data/tarefas.json`)   |
-| Deploy        | Vercel (sem Docker, sem banco de dados) |
-
-
-##  Estrutura do projeto
+## Estrutura do Projeto
 
 ```text
 task-manager/
 │
 ├── api/
-│   └── index.py          # Aplicação Flask + API REST
+│   ├── index.py                  # Entrypoint Flask, rotas REST e Vercel serverless
+│   ├── config.py                 # Configurações, diretórios e leitor de .env
+│   └── services/
+│       ├── task_service.py       # Persistência JSON, subtarefas e métricas
+│       └── ai_service.py         # Assistente de IA seguro (backend proxy)
 │
 ├── templates/
-│   └── index.html        # Página principal (HTML)
+│   └── index.html                # Interface semântica com dashboard e modais
 │
 ├── static/
 │   ├── css/
-│   │   └── style.css     # Estilos (tema escuro, responsivo)
-│   └── js/
-│       └── script.js     # Lógica do frontend (fetch, DOM, toasts)
+│   │   └── style.css             # Estilos modernos com gradientes animados
+│   ├── js/
+│   │   └── script.js             # Lógica reativa, atalhos, checklist e áudio
+│   └── favicon.svg               # Ícone do aplicativo
 │
 ├── data/
-│   └── tarefas.json      # "Banco de dados" em JSON
+│   └── tarefas.json              # Armazenamento base em JSON
 │
-├── requirements.txt       # Dependências Python
-├── vercel.json             # Configuração de deploy da Vercel
-├── .gitignore
+├── .env.example                  # Modelo de variáveis de ambiente
+├── requirements.txt              # Dependências Python
+├── vercel.json                   # Configuração serverless da Vercel
+├── .gitignore                    # Arquivos ignorados (.env protegido)
 └── README.md
 ```
 
+---
 
-## 🚀 Instalação e execução local
+## Instalação e Execução Local
 
 ### Pré-requisitos
+- Python 3.9+ instalado
+- `pip`
 
-- Python 3.9 ou superior instalado ([python.org](https://www.python.org/downloads/))
-- `pip` (já vem com o Python)
+### 1. Configurar variáveis de ambiente (Opcional)
+Copie o arquivo de exemplo para criar seu `.env`:
+```bash
+cp .env.example .env
+```
+Adicione sua chave `GEMINI_API_KEY` se desejar utilizar o modelo Gemini do Google para quebra automática de tarefas.
 
-### Passo a passo
+### 2. Instalar dependências
+```bash
+pip install -r requirements.txt
+```
 
-1. **Clone ou baixe o projeto** e entre na pasta:
+### 3. Iniciar o servidor
+```bash
+python api/index.py
+```
 
-   ```bash
-   cd task-manager
-   ```
+Acesse em: [http://localhost:5000](http://localhost:5000)
 
-2. **Crie um ambiente virtual** (recomendado):
+---
 
-   ```bash
-   python3 -m venv venv
-   ```
+## API REST
 
-3. **Ative o ambiente virtual:**
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/tasks` | Lista todas as tarefas |
+| `POST` | `/api/tasks` | Cria uma nova tarefa (com prioridade, tag, prazo e subtarefas) |
+| `PUT` | `/api/tasks/<id>` | Atualiza dados e subtarefas de uma tarefa |
+| `DELETE` | `/api/tasks/<id>` | Exclui uma tarefa |
+| `PATCH` | `/api/tasks/<id>/toggle` | Alterna status de conclusão |
+| `POST` | `/api/tasks/<id>/subtasks` | Adiciona subtarefa ao item |
+| `PATCH` | `/api/tasks/<id>/subtasks/<sub_id>/toggle` | Alterna conclusão de uma subtarefa |
+| `DELETE` | `/api/tasks/<id>/subtasks/<sub_id>` | Remove uma subtarefa |
+| `POST` | `/api/tasks/clear-completed` | Limpa em massa tarefas concluídas |
+| `POST` | `/api/ai/breakdown` | Quebra de tarefa via IA no backend |
+| `GET` | `/api/stats` | Estatísticas completas do dashboard |
 
-   - Linux / macOS:
-     ```bash
-     source venv/bin/activate
-     ```
-   - Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
+---
 
-4. **Instale as dependências:**
+## Deploy na Vercel
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Execute a aplicação:**
-
-   ```bash
-   python api/index.py
-   ```
-
-6. **Acesse no navegador:**
-
-   ```text
-   http://localhost:5000
-   ```
-
-Pronto! A aplicação já estará funcionando localmente, salvando as tarefas em `data/tarefas.json`.
-
-
-###  Observação importante sobre o armazenamento em produção
-
-Funções serverless da Vercel possuem sistema de arquivos **somente leitura**, com exceção da pasta temporária `/tmp`. Por isso, o backend detecta automaticamente quando está rodando na Vercel (variável de ambiente `VERCEL`) e passa a gravar as tarefas em `/tmp/tarefas.json` em vez do arquivo original.
-
-Isso mantém o app 100% funcional (criar, editar, excluir e concluir tarefas) sem precisar de nenhum banco de dados externo — mas é bom saber que **os dados são reiniciados a cada novo "cold start"** da função (por exemplo, após um novo deploy ou período de inatividade). Para um projeto real em produção, o recomendado seria trocar o armazenamento por um banco de dados (Postgres, Redis, etc.). Para fins de estudo e portfólio, o comportamento atual é perfeitamente adequado.
-
-
-## 🔌 API — Endpoints
-
-| Método | Rota                      | Descrição                                  |
-|--------|---------------------------|---------------------------------------------|
-| GET    | `/api/tasks`               | Lista todas as tarefas                      |
-| POST   | `/api/tasks`               | Cria uma nova tarefa                        |
-| PUT    | `/api/tasks/<id>`           | Edita título/descrição de uma tarefa        |
-| DELETE | `/api/tasks/<id>`           | Exclui uma tarefa                           |
-| PATCH  | `/api/tasks/<id>/toggle`    | Alterna entre concluída e pendente          |
-| GET    | `/api/stats`                | Retorna as estatísticas do dashboard        |
-
-
-
-Feito com 🐍 Python, 🌶️ Flask e JavaScript puro.
+O projeto está pronto para a Vercel através do arquivo [vercel.json](file:///d:/projetos-git/managertask/vercel.json). Na Vercel, o armazenamento utiliza `/tmp/tarefas.json` para permitir gravação nas funções serverless. Para configurar a chave de IA na Vercel, basta adicionar `GEMINI_API_KEY` nas variáveis de ambiente da plataforma.
