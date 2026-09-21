@@ -49,6 +49,8 @@ html, body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
 }
 
 .three-canvas {
@@ -75,8 +77,54 @@ html, body {
   position: relative;
   z-index: 1;
   max-width: 880px;
+  width: 100%;
   margin: 0 auto;
-  padding: 38px 24px 70px;
+  padding: 38px 24px 24px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-list-section {
+  flex: 1;
+}
+
+.app-footer {
+  margin-top: auto;
+  padding-top: 40px;
+  padding-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-footer-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 20, 31, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 18px;
+  border-radius: 99px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.app-footer-inner p {
+  font-size: 13px;
+  font-weight: 500;
+  color: #cbd5e1;
+  letter-spacing: 0.2px;
+}
+
+.footer-brand-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 8px var(--primary);
+  flex-shrink: 0;
 }
 
 .masthead {
@@ -1078,17 +1126,76 @@ select option {
 
 .modal--confirm {
   text-align: center;
-  max-width: 320px;
+  max-width: 360px;
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.confirm-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--priority-high);
+  margin-bottom: 14px;
+}
+
+.confirm-icon-wrap svg {
+  width: 22px;
+  height: 22px;
 }
 
 .modal--confirm h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
   margin-bottom: 6px;
 }
 
 .modal--confirm p {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--text-secondary);
-  margin-bottom: 16px;
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+
+.modal--confirm .modal-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.modal--confirm .btn-secondary,
+.modal--confirm .btn-danger {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.modal--confirm .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal--confirm .btn-danger:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.35);
 }
 
 .shortcuts-list {
