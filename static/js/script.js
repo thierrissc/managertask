@@ -83,6 +83,14 @@
   const btnCancelDelete = document.getElementById("btnCancelDelete");
   const btnConfirmDelete = document.getElementById("btnConfirmDelete");
 
+  const noteModalOverlay = document.getElementById("noteModalOverlay");
+  const noteModalTaskTitle = document.getElementById("noteModalTaskTitle");
+  const noteModalText = document.getElementById("noteModalText");
+  const btnCloseNoteModalX = document.getElementById("btnCloseNoteModalX");
+  const btnCloseNoteModal = document.getElementById("btnCloseNoteModal");
+  const btnEditFromNoteModal = document.getElementById("btnEditFromNoteModal");
+  let idParaVerNota = null;
+
   const shortcutsModalOverlay = document.getElementById("shortcutsModalOverlay");
   const btnOpenShortcuts = document.getElementById("btnOpenShortcuts");
   const btnCloseShortcuts = document.getElementById("btnCloseShortcuts");
@@ -195,6 +203,8 @@
     editModalOverlay.hidden = true;
     confirmModalOverlay.hidden = true;
     shortcutsModalOverlay.hidden = true;
+    if (noteModalOverlay) noteModalOverlay.hidden = true;
+    restaurarFiltrosSalvos();
     atualizarHeaderDate();
     carregarTarefas();
     configurarEventos();
@@ -249,6 +259,84 @@
     const d = filtroData ? converterISOParaData(filtroData) : new Date();
     const texto = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
     headerDate.textContent = texto.charAt(0).toUpperCase() + texto.slice(1);
+  }
+
+  function restaurarFiltrosSalvos() {
+    try {
+      const s = localStorage.getItem("managertask_status");
+      if (s && ["todas", "pendentes", "concluidas"].includes(s)) {
+        filtroStatus = s;
+        const statusFilterMenu = document.getElementById("statusFilterMenu");
+        const statusFilterLabel = document.getElementById("statusFilterLabel");
+        if (statusFilterMenu) {
+          const item = statusFilterMenu.querySelector(`[data-status="${s}"]`);
+          if (item) {
+            statusFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+              el.classList.remove("is-selected");
+              const chk = el.querySelector(".dropdown-check");
+              if (chk) chk.textContent = "";
+            });
+            item.classList.add("is-selected");
+            const chk = item.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "✓";
+            const labels = { todas: "Status: Todas", pendentes: "Status: Pendentes", concluidas: "Status: Concluídas" };
+            if (statusFilterLabel) statusFilterLabel.textContent = labels[s] || "Status";
+          }
+        }
+      }
+
+      const r = localStorage.getItem("managertask_rec");
+      if (r && ["todas", "diaria", "semanal", "mensal", "anual", "unica"].includes(r)) {
+        filtroRecorrencia = r;
+        const recFilterMenu = document.getElementById("recFilterMenu");
+        const recFilterLabel = document.getElementById("recFilterLabel");
+        if (recFilterMenu) {
+          const item = recFilterMenu.querySelector(`[data-rec="${r}"]`);
+          if (item) {
+            recFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+              el.classList.remove("is-selected");
+              const chk = el.querySelector(".dropdown-check");
+              if (chk) chk.textContent = "";
+            });
+            item.classList.add("is-selected");
+            const chk = item.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "✓";
+            const recLabels = { todas: "Repetição: Todas", diaria: "Repetição: Diárias", semanal: "Repetição: Semanais", mensal: "Repetição: Mensais", anual: "Repetição: Anuais", unica: "Repetição: Única vez" };
+            if (recFilterLabel) recFilterLabel.textContent = recLabels[r] || "Repetição";
+          }
+        }
+      }
+
+      const o = localStorage.getItem("managertask_sort");
+      if (o && ["recente", "prioridade", "recorrencia", "vencimento", "alfabetica", "antiga"].includes(o)) {
+        ordenacao = o;
+        const sortFilterMenu = document.getElementById("sortFilterMenu");
+        const sortFilterLabel = document.getElementById("sortFilterLabel");
+        if (sortFilterMenu) {
+          const item = sortFilterMenu.querySelector(`[data-sort="${o}"]`);
+          if (item) {
+            sortFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+              el.classList.remove("is-selected");
+              const chk = el.querySelector(".dropdown-check");
+              if (chk) chk.textContent = "";
+            });
+            item.classList.add("is-selected");
+            const chk = item.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "✓";
+            const labels = { recente: "Ordenar: Recentes", prioridade: "Ordenar: Prioridade", recorrencia: "Ordenar: Repetição", vencimento: "Ordenar: Prazo", alfabetica: "Ordenar: A-Z", antiga: "Ordenar: Antigas" };
+            if (sortFilterLabel) sortFilterLabel.textContent = labels[o] || "Ordenar";
+          }
+        }
+      }
+
+      const c = localStorage.getItem("managertask_cat");
+      if (c) {
+        filtroCategoria = c;
+        document.querySelectorAll(".cat-chip").forEach(chip => {
+          chip.classList.toggle("is-active", chip.dataset.category === c);
+        });
+      }
+    } catch (e) {}
   }
 
   async function carregarTarefas() {
@@ -426,25 +514,24 @@
       }
 
       if (tarefa.descricao) {
-        const hint = document.createElement("span");
-        hint.className = "task-desc-hint";
-        hint.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
-        titleRow.appendChild(hint);
+        const noteBtn = document.createElement("button");
+        noteBtn.type = "button";
+        noteBtn.className = "task-note-btn";
+        noteBtn.title = "Abrir anotação da tarefa";
+        noteBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>Nota</span>`;
+        noteBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          abrirModalNota(tarefa);
+        });
+        titleRow.appendChild(noteBtn);
       }
 
       content.appendChild(titleRow);
 
       if (tarefa.descricao) {
-        const expandWrap = document.createElement("div");
-        expandWrap.className = "task-expanded-detail";
-        const descText = document.createElement("p");
-        descText.className = "task-desc-text";
-        descText.textContent = tarefa.descricao;
-        expandWrap.appendChild(descText);
-        content.appendChild(expandWrap);
-
+        content.style.cursor = "pointer";
         content.addEventListener("click", () => {
-          item.classList.toggle("is-expanded");
+          abrirModalNota(tarefa);
         });
       }
 
@@ -786,6 +873,18 @@
     subtarefasEdicao = [];
   }
 
+  function abrirModalNota(tarefa) {
+    idParaVerNota = tarefa.id;
+    if (noteModalTaskTitle) noteModalTaskTitle.textContent = tarefa.titulo || "Sem título";
+    if (noteModalText) noteModalText.textContent = tarefa.descricao || "Nenhuma anotação adicionada.";
+    if (noteModalOverlay) noteModalOverlay.hidden = false;
+  }
+
+  function fecharModalNota() {
+    if (noteModalOverlay) noteModalOverlay.hidden = true;
+    idParaVerNota = null;
+  }
+
   function renderizarModalSubtasks() {
     modalSubtasksList.innerHTML = "";
     subtarefasEdicao.forEach((s, idx) => {
@@ -1083,6 +1182,7 @@
       statusFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
         item.addEventListener("click", () => {
           filtroStatus = item.dataset.status;
+          try { localStorage.setItem("managertask_status", filtroStatus); } catch (e) {}
           statusFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
             el.classList.remove("is-selected");
             const chk = el.querySelector(".dropdown-check");
@@ -1127,6 +1227,7 @@
       recFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
         item.addEventListener("click", () => {
           filtroRecorrencia = item.dataset.rec;
+          try { localStorage.setItem("managertask_rec", filtroRecorrencia); } catch (e) {}
           recFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
             el.classList.remove("is-selected");
             const chk = el.querySelector(".dropdown-check");
@@ -1174,6 +1275,7 @@
       sortFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
         item.addEventListener("click", () => {
           ordenacao = item.dataset.sort;
+          try { localStorage.setItem("managertask_sort", ordenacao); } catch (e) {}
           sortFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
             el.classList.remove("is-selected");
             const chk = el.querySelector(".dropdown-check");
@@ -1222,6 +1324,7 @@
         document.querySelectorAll(".cat-chip").forEach(c => c.classList.remove("is-active"));
         chip.classList.add("is-active");
         filtroCategoria = chip.dataset.category;
+        try { localStorage.setItem("managertask_cat", filtroCategoria); } catch (e) {}
         renderizarLista();
       });
     });
@@ -1334,10 +1437,27 @@
       }
     });
 
+    if (btnCloseNoteModalX) btnCloseNoteModalX.addEventListener("click", fecharModalNota);
+    if (btnCloseNoteModal) btnCloseNoteModal.addEventListener("click", fecharModalNota);
+    if (noteModalOverlay) {
+      noteModalOverlay.addEventListener("click", e => {
+        if (e.target === noteModalOverlay) fecharModalNota();
+      });
+    }
+    if (btnEditFromNoteModal) {
+      btnEditFromNoteModal.addEventListener("click", () => {
+        const t = tarefas.find(item => item.id === idParaVerNota);
+        fecharModalNota();
+        if (t) abrirModalEdicao(t);
+      });
+    }
+
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") {
         if (statusFilterMenu) statusFilterMenu.hidden = true;
         if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+        if (recFilterMenu) recFilterMenu.hidden = true;
+        if (btnRecFilter) btnRecFilter.setAttribute("aria-expanded", "false");
         if (sortFilterMenu) sortFilterMenu.hidden = true;
         if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
         calendarPopover.hidden = true;
@@ -1345,6 +1465,7 @@
         fecharModalCriacao();
         fecharModalEdicao();
         fecharModalConfirmacao();
+        fecharModalNota();
         shortcutsModalOverlay.hidden = true;
       } else if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
         e.preventDefault();
