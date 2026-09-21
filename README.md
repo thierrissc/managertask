@@ -1,74 +1,65 @@
-# Task Manager PRO
+<div align="center">
 
-Um gerenciador de tarefas web moderno, inteligente e de alta performance — construído com **Python + Flask** modular no backend e **HTML5, CSS3 avançado com gradientes animados e JavaScript puro** no frontend, usando persistência em JSON e integração segura com IA via servidor.
+# ManagerTask
 
-![status](https://img.shields.io/badge/status-pronto%20para%20uso-6366f1)
-![python](https://img.shields.io/badge/python-3.x-10b981)
-![flask](https://img.shields.io/badge/flask-3.x-8b5cf6)
+Gerenciador de tarefas inteligente, moderno e de alta performance com suporte a checklist, tarefas recorrentes (diárias, semanais, mensais e anuais) e quebra de tarefas com inteligência artificial.
 
----
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+  <img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="Three.js" />
+  <img src="https://img.shields.io/badge/Google_Gemini-8E75C2?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" />
+</p>
+
+</div>
 
 ## Destaques & Funcionalidades
 
-- **Design System Moderno**:
-  - Tema escuro profundo com malha de iluminação indireta (`radial-gradient`).
-  - Gradientes animados fluidos em botões de ação e barras de progresso.
-  - Efeitos de glassmorphism e micro-interações táteis.
-- **Prioridades & Categorias**:
-  - Níveis de prioridade (*Alta*, *Média*, *Baixa*) com badges coloridos.
-  - Categorias / Tags inteligentes (*Trabalho*, *Pessoal*, *Estudos*, *Urgente*, *Ideias*).
-- **Prazos & Datas de Vencimento**:
-  - Alerta inteligente de tarefas no prazo, hoje, amanhã ou atrasadas.
-  - Mini calendário interativo para navegação e filtro por dia.
-- **Subtarefas & Checklist**:
-  - Adição e acompanhamento de subtarefas dentro de cada tarefa com contagem e progresso.
-- **Assistente com IA (Server-Side Proxy)**:
-  - Quebra automática de tarefas em subtarefas práticas com inteligência artificial.
-  - A chave da API Gemini é configurada estritamente no backend (`.env`), nunca sendo exposta ao navegador do cliente. Possui fallback inteligente caso nenhuma chave esteja configurada.
-- **Busca em Tempo Real & Atalhos de Teclado**:
-  - Barra de busca instantânea por título, descrição ou categoria.
-  - Atalhos: `N` para nova tarefa, `/` para pesquisar e `Esc` para fechar modais.
-- **Áudio & Feedback Tátil**:
-  - Efeito sonoro suave gerado nativamente via Web Audio API ao concluir tarefas.
-- **Ações em Massa & Backup**:
-  - Remoção em lote de tarefas concluídas.
-  - Exportação de dados em arquivo `.json`.
-
----
+- **Tarefas Recorrentes com Auto Reset**:
+  - Suporte a repetição diária, semanal, mensal e anual.
+  - Tarefas diárias concluídas são automaticamente renovadas no início de cada novo dia, desmarcando o checklist para recomeçar o hábito.
+- **Filtros e Organização Inteligentes**:
+  - Filtro por status (Todas, Pendentes, Concluídas).
+  - Filtro por recorrência (Todas, Diárias, Semanais, Mensais, Anuais, Única vez).
+  - Ordenação por data recente, prioridade, frequência/repetição, prazo e ordem alfabética.
+- **Subtarefas & Checklist Padronizado**:
+  - Barras de checklist uniformes e elegantes, com progresso dinâmico e expansão instantânea.
+- **Assistente com Inteligência Artificial**:
+  - Quebra automática de tarefas complexas em subtarefas estruturadas via Google Gemini.
+  - Proxy seguro no backend protegendo a chave de API contra vazamentos.
+- **Armazenamento e Privacidade por IP**:
+  - As tarefas são armazenadas de forma persistente e particionadas pelo IP da rede, permitindo alternar entre computador e celular sem necessidade de login.
+- **Design Moderno e Interativo**:
+  - Fundo dinâmico com malha 3D animada em Three.js.
+  - Gradientes suaves, tema escuro nativo e feedback auditivo ao concluir tarefas.
 
 ## Estrutura do Projeto
 
 ```text
-task-manager/
-│
+managertask/
 ├── api/
-│   ├── index.py                  # Entrypoint Flask, rotas REST e Vercel serverless
-│   ├── config.py                 # Configurações, diretórios e leitor de .env
+│   ├── index.py                  # Servidor Flask, rotas REST e particionamento por IP
+│   ├── config.py                 # Configurações do ambiente
 │   └── services/
-│       ├── task_service.py       # Persistência JSON, subtarefas e métricas
-│       └── ai_service.py         # Assistente de IA seguro (backend proxy)
-│
+│       ├── task_service.py       # Regras de negócio, recorrência e persistência
+│       └── ai_service.py         # Integração segura com IA
 ├── templates/
-│   └── index.html                # Interface semântica com dashboard e modais
-│
+│   └── index.html                # Interface visual da aplicação
 ├── static/
 │   ├── css/
-│   │   └── style.css             # Estilos modernos com gradientes animados
+│   │   └── style.css             # Estilos responsivos e tema escuro
 │   ├── js/
-│   │   └── script.js             # Lógica reativa, atalhos, checklist e áudio
+│   │   └── script.js             # Lógica reativa no frontend e animações Three.js
 │   └── favicon.svg               # Ícone do aplicativo
-│
 ├── data/
-│   └── tarefas.json              # Armazenamento base em JSON
-│
-├── .env.example                  # Modelo de variáveis de ambiente
-├── requirements.txt              # Dependências Python
-├── vercel.json                   # Configuração serverless da Vercel
-├── .gitignore                    # Arquivos ignorados (.env protegido)
+│   └── tarefas.json              # Base de dados em JSON
+├── .env.example                  # Exemplo de configuração de variáveis
+├── requirements.txt              # Dependências do Python
 └── README.md
 ```
-
----
 
 ## Instalação e Execução Local
 
@@ -77,44 +68,36 @@ task-manager/
 - `pip`
 
 ### 1. Configurar variáveis de ambiente (Opcional)
-Copie o arquivo de exemplo para criar seu `.env`:
+Copie o arquivo de exemplo:
 ```bash
 cp .env.example .env
 ```
-Adicione sua chave `GEMINI_API_KEY` se desejar utilizar o modelo Gemini do Google para quebra automática de tarefas.
+Adicione sua chave `GEMINI_API_KEY` caso deseje utilizar o assistente de IA.
 
 ### 2. Instalar dependências
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Iniciar o servidor
+### 3. Iniciar a aplicação
 ```bash
 python api/index.py
 ```
 
 Acesse em: [http://localhost:5000](http://localhost:5000)
 
----
-
 ## API REST
 
 | Método | Endpoint | Descrição |
 |---|---|---|
-| `GET` | `/api/tasks` | Lista todas as tarefas |
-| `POST` | `/api/tasks` | Cria uma nova tarefa (com prioridade, tag, prazo e subtarefas) |
+| `GET` | `/api/tasks` | Retorna todas as tarefas particionadas pelo IP do cliente |
+| `POST` | `/api/tasks` | Cria nova tarefa (com prioridade, recorrência, prazo e checklist) |
 | `PUT` | `/api/tasks/<id>` | Atualiza dados e subtarefas de uma tarefa |
 | `DELETE` | `/api/tasks/<id>` | Exclui uma tarefa |
 | `PATCH` | `/api/tasks/<id>/toggle` | Alterna status de conclusão |
-| `POST` | `/api/tasks/<id>/subtasks` | Adiciona subtarefa ao item |
-| `PATCH` | `/api/tasks/<id>/subtasks/<sub_id>/toggle` | Alterna conclusão de uma subtarefa |
-| `DELETE` | `/api/tasks/<id>/subtasks/<sub_id>` | Remove uma subtarefa |
-| `POST` | `/api/tasks/clear-completed` | Limpa em massa tarefas concluídas |
-| `POST` | `/api/ai/breakdown` | Quebra de tarefa via IA no backend |
-| `GET` | `/api/stats` | Estatísticas completas do dashboard |
-
----
-
-## Deploy na Vercel
-
-O projeto está pronto para a Vercel através do arquivo [vercel.json](file:///d:/projetos-git/managertask/vercel.json). Na Vercel, o armazenamento utiliza `/tmp/tarefas.json` para permitir gravação nas funções serverless. Para configurar a chave de IA na Vercel, basta adicionar `GEMINI_API_KEY` nas variáveis de ambiente da plataforma.
+| `POST` | `/api/tasks/<id>/subtasks` | Adiciona um item ao checklist |
+| `PATCH` | `/api/tasks/<id>/subtasks/<sub_id>/toggle` | Alterna conclusão de item do checklist |
+| `DELETE` | `/api/tasks/<id>/subtasks/<sub_id>` | Remove item do checklist |
+| `POST` | `/api/tasks/clear-completed` | Remove tarefas concluídas em massa |
+| `POST` | `/api/ai/breakdown` | Sugestão e quebra de tarefas via IA |
+| `GET` | `/api/stats` | Métricas e estatísticas em tempo real |
