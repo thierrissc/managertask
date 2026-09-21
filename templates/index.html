@@ -136,6 +136,45 @@
             </div>
           </div>
 
+          <div class="filter-dropdown-wrap" id="recFilterWrap">
+            <button type="button" class="btn-filter-dropdown" id="btnRecFilter" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+              </svg>
+              <span id="recFilterLabel">Repetição: Todas</span>
+              <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="filter-dropdown-menu" id="recFilterMenu" hidden>
+              <button type="button" class="dropdown-item is-selected" data-rec="todas">
+                <span class="dropdown-check">✓</span>
+                <span>Todas as repetições</span>
+              </button>
+              <button type="button" class="dropdown-item" data-rec="diaria">
+                <span class="dropdown-check"></span>
+                <span>Diárias</span>
+              </button>
+              <button type="button" class="dropdown-item" data-rec="semanal">
+                <span class="dropdown-check"></span>
+                <span>Semanais</span>
+              </button>
+              <button type="button" class="dropdown-item" data-rec="mensal">
+                <span class="dropdown-check"></span>
+                <span>Mensais</span>
+              </button>
+              <button type="button" class="dropdown-item" data-rec="anual">
+                <span class="dropdown-check"></span>
+                <span>Anuais</span>
+              </button>
+              <button type="button" class="dropdown-item" data-rec="unica">
+                <span class="dropdown-check"></span>
+                <span>Única vez</span>
+              </button>
+            </div>
+          </div>
+
           <div class="filter-dropdown-wrap" id="sortFilterWrap">
             <button type="button" class="btn-filter-dropdown" id="btnSortFilter" aria-haspopup="true" aria-expanded="false">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -156,6 +195,10 @@
               <button type="button" class="dropdown-item" data-sort="prioridade">
                 <span class="dropdown-check"></span>
                 <span>Prioridade (Alta > Baixa)</span>
+              </button>
+              <button type="button" class="dropdown-item" data-sort="recorrencia">
+                <span class="dropdown-check"></span>
+                <span>Frequência / Repetição</span>
               </button>
               <button type="button" class="dropdown-item" data-sort="vencimento">
                 <span class="dropdown-check"></span>
