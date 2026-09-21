@@ -92,39 +92,16 @@ html, body {
 .app-footer {
   margin-top: auto;
   padding-top: 40px;
-  padding-bottom: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding-bottom: 20px;
+  text-align: center;
 }
 
-.app-footer-inner {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(18, 20, 31, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 8px 18px;
-  border-radius: 99px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-}
-
-.app-footer-inner p {
-  font-size: 13px;
+.app-footer p {
+  font-size: 13.5px;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #e2e8f0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
   letter-spacing: 0.2px;
-}
-
-.footer-brand-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 8px var(--primary);
-  flex-shrink: 0;
 }
 
 .masthead {
@@ -809,7 +786,6 @@ select option {
 
 .task-item.is-done .task-title {
   color: var(--text-muted);
-  text-decoration: line-through;
 }
 
 .task-item.has-desc .task-content {
