@@ -31,6 +31,7 @@ def _get_default_tasks():
             "descricao": "Focar nas disciplinas de maior peso do edital, fazer resumos esquematizados e praticar resolução de questões comentadas.",
             "prioridade": "alta",
             "categoria": "estudos",
+            "recorrencia": "diaria",
             "data_vencimento": "",
             "hora_vencimento": "",
             "subtarefas": [
@@ -48,6 +49,7 @@ def _get_default_tasks():
             "descricao": "Revisar anotações de aula, fórmulas fundamentais e refazer os exercícios mais desafiadores da lista recomendada.",
             "prioridade": "media",
             "categoria": "estudos",
+            "recorrencia": "unica",
             "data_vencimento": "",
             "hora_vencimento": "",
             "subtarefas": [
@@ -83,6 +85,49 @@ def _save_raw_store(store):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(store, f, ensure_ascii=False, indent=2)
 
+def _process_recurrences(tasks):
+    today = date.today()
+    changed = False
+    for t in tasks:
+        rec = (t.get("recorrencia") or "unica").strip().lower()
+        if rec in ["unica", "nenhuma", ""]:
+            continue
+
+        if not t.get("concluida"):
+            continue
+
+        data_conc_str = t.get("data_conclusao")
+        if not data_conc_str:
+            continue
+
+        try:
+            done_date = datetime.strptime(data_conc_str[:10], "%Y-%m-%d").date()
+        except Exception:
+            continue
+
+        should_reset = False
+        if rec == "diaria":
+            if done_date < today:
+                should_reset = True
+        elif rec == "semanal":
+            if done_date.isocalendar()[:2] < today.isocalendar()[:2]:
+                should_reset = True
+        elif rec == "mensal":
+            if (done_date.year, done_date.month) < (today.year, today.month):
+                should_reset = True
+        elif rec == "anual":
+            if done_date.year < today.year:
+                should_reset = True
+
+        if should_reset:
+            t["concluida"] = False
+            t["data_conclusao"] = None
+            for sub in t.get("subtarefas", []):
+                sub["concluida"] = False
+            changed = True
+
+    return changed
+
 def get_all_tasks(client_ip="127.0.0.1"):
     client_ip = (client_ip or "127.0.0.1").strip()
     store = _read_raw_store()
@@ -103,10 +148,15 @@ def get_all_tasks(client_ip="127.0.0.1"):
     for t in tasks:
         t.setdefault("prioridade", "media")
         t.setdefault("categoria", "geral")
+        t.setdefault("recorrencia", "unica")
         t.setdefault("data_vencimento", "")
         t.setdefault("hora_vencimento", "")
         t.setdefault("subtarefas", [])
+        t.setdefault("concluida", False)
         t.setdefault("data_conclusao", None)
+
+    if _process_recurrences(tasks):
+        save_all_tasks(tasks, client_ip)
 
     return tasks
 
@@ -146,12 +196,17 @@ def create_task(data, client_ip="127.0.0.1"):
             })
             sub_id += 1
 
+    rec_val = (data.get("recorrencia") or "unica").strip().lower()
+    if rec_val not in ["unica", "diaria", "semanal", "mensal", "anual"]:
+        rec_val = "unica"
+
     new_task = {
         "id": next_task_id(tasks),
         "titulo": titulo,
         "descricao": (data.get("descricao") or "").strip(),
         "prioridade": data.get("prioridade", "media") if data.get("prioridade") in ["alta", "media", "baixa"] else "media",
         "categoria": (data.get("categoria") or "geral").strip().lower(),
+        "recorrencia": rec_val,
         "data_vencimento": (data.get("data_vencimento") or "").strip(),
         "hora_vencimento": (data.get("hora_vencimento") or "").strip(),
         "subtarefas": subtarefas,
@@ -181,6 +236,9 @@ def update_task(task_id, data, client_ip="127.0.0.1"):
         task["prioridade"] = data["prioridade"]
     if "categoria" in data:
         task["categoria"] = (data.get("categoria") or "geral").strip().lower()
+    if "recorrencia" in data:
+        r_val = (data.get("recorrencia") or "unica").strip().lower()
+        task["recorrencia"] = r_val if r_val in ["unica", "diaria", "semanal", "mensal", "anual"] else "unica"
     if "data_vencimento" in data:
         task["data_vencimento"] = (data.get("data_vencimento") or "").strip()
     if "hora_vencimento" in data:
