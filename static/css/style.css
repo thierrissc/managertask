@@ -15,7 +15,7 @@
   --text-muted: #64748b;
   
   --priority-high: #f43f5e;
-  --priority-med: #f59e0b;
+  --priority-med: #facc15;
   --priority-low: #10b981;
   
   --radius-sm: 8px;
@@ -317,8 +317,8 @@ html, body {
 }
 
 .progress-track {
-  width: 60px;
-  height: 5px;
+  width: 90px;
+  height: 6px;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -327,10 +327,16 @@ html, body {
 .progress-bar-fill {
   height: 100%;
   border-radius: 99px;
-  background: linear-gradient(90deg, #6366f1, #ec4899);
-  background-size: 200% 100%;
-  animation: gradientShift 3s ease infinite;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #10b981, #6366f1);
+  background-size: 300% 100%;
+  animation: progressGradient 3s linear infinite;
   transition: width 300ms ease;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+}
+
+@keyframes progressGradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
 }
 
 .progress-text {
@@ -684,7 +690,14 @@ select option {
 }
 
 .task-item.is-done {
-  opacity: 0.55;
+  opacity: 0.65;
+  border-left-color: var(--priority-low) !important;
+}
+
+.task-item.is-done .task-prio-dot {
+  background: var(--priority-low) !important;
+  color: var(--priority-low) !important;
+  box-shadow: 0 0 6px var(--priority-low) !important;
 }
 
 .task-item.prio-alta {
@@ -876,22 +889,24 @@ select option {
 .task-rec-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.28);
-  color: #a5b4fc;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-size: 11px;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #c7d2fe;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
   user-select: none;
+  line-height: 1.2;
+  transition: all var(--transition);
 }
 
 .task-rec-badge svg {
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
 }
 
 .task-checklist-section {
@@ -1000,8 +1015,14 @@ select option {
 .empty-state {
   text-align: center;
   padding: 48px 20px;
-  color: var(--text-muted);
-  font-size: 13.5px;
+}
+
+.empty-state p {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #e2e8f0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+  letter-spacing: 0.2px;
 }
 
 .modal-overlay {
