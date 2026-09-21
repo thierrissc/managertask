@@ -39,6 +39,31 @@ Gerenciador de tarefas inteligente, moderno e interativo com suporte a checklist
 - **Interface Moderna**:
   - Fundo animado 3D em Three.js, barra de progresso com gradiente e efeitos táteis.
 
+## Estrutura do Projeto
+
+```text
+managertask/
+├── api/
+│   ├── index.py                  # Servidor Flask, rotas REST e particionamento por IP
+│   ├── config.py                 # Configurações do ambiente
+│   └── services/
+│       ├── task_service.py       # Regras de negócio, recorrência e persistência
+│       └── ai_service.py         # Integração segura com IA
+├── templates/
+│   └── index.html                # Interface visual da aplicação
+├── static/
+│   ├── css/
+│   │   └── style.css             # Estilos responsivos e tema escuro
+│   ├── js/
+│   │   └── script.js             # Lógica reativa no frontend e animações Three.js
+│   └── favicon.svg               # Ícone do aplicativo
+├── data/
+│   └── tarefas.json              # Base de dados em JSON
+├── .env.example                  # Exemplo de configuração de variáveis
+├── requirements.txt              # Dependências do Python
+└── README.md
+```
+
 ## Como Executar
 
 ### Pré-requisitos
