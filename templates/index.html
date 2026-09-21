@@ -364,6 +364,25 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="noteModalOverlay" hidden>
+    <div class="modal note-modal" role="dialog" aria-modal="true" aria-labelledby="noteModalTaskTitle">
+      <div class="modal-header">
+        <div class="note-modal-header-info">
+          <span class="note-modal-badge">Notas & Detalhes</span>
+          <h3 id="noteModalTaskTitle" class="note-modal-title">Título da Tarefa</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseNoteModalX">✕</button>
+      </div>
+      <div class="note-modal-body">
+        <div id="noteModalText" class="note-modal-content"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="btnCloseNoteModal">Fechar</button>
+        <button type="button" class="btn-primary" id="btnEditFromNoteModal">Editar Tarefa</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="confirmModalOverlay" hidden>
     <div class="modal modal--confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
       <div class="confirm-icon-wrap">
