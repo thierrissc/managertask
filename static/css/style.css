@@ -74,9 +74,9 @@ html, body {
 .page {
   position: relative;
   z-index: 1;
-  max-width: 680px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 32px 18px 60px;
+  padding: 38px 24px 70px;
 }
 
 .masthead {
@@ -84,7 +84,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .mast-brand {
@@ -94,8 +94,8 @@ html, body {
 }
 
 .brand-glow-wrapper {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   position: relative;
 }
 
@@ -105,9 +105,9 @@ html, body {
 }
 
 .mast-brand h1 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
   color: #fff;
 }
 
@@ -319,15 +319,15 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 14px;
-  margin-bottom: 22px;
+  padding: 16px;
+  margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
 }
 
 .creator-input-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .creator-input-wrap input {
@@ -335,8 +335,8 @@ html, body {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
-  font-size: 14px;
+  padding: 13px 18px;
+  font-size: 15px;
   color: var(--text-primary);
   outline: none;
   transition: border-color var(--transition);
@@ -350,13 +350,13 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   background: rgba(236, 72, 153, 0.12);
   border: 1px solid rgba(236, 72, 153, 0.35);
   color: #f472b6;
-  padding: 10px 18px;
+  padding: 13px 22px;
   border-radius: var(--radius-md);
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition);
@@ -364,8 +364,8 @@ html, body {
 }
 
 .btn-ai-action svg {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .btn-ai-action:hover {
@@ -380,9 +380,9 @@ html, body {
   animation: gradientShift 4s ease infinite;
   border: none;
   color: #fff;
-  padding: 10px 18px;
+  padding: 13px 22px;
   border-radius: var(--radius-md);
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   transition: opacity var(--transition);
@@ -462,6 +462,13 @@ select option {
   margin-bottom: 14px;
 }
 
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .search-box {
   flex: 1;
   position: relative;
@@ -471,9 +478,9 @@ select option {
 
 .search-box svg {
   position: absolute;
-  left: 12px;
-  width: 14px;
-  height: 14px;
+  left: 14px;
+  width: 16px;
+  height: 16px;
   color: var(--text-muted);
 }
 
@@ -482,8 +489,8 @@ select option {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 8px 12px 8px 34px;
-  font-size: 13px;
+  padding: 10px 14px 10px 40px;
+  font-size: 14px;
   color: var(--text-primary);
   outline: none;
   transition: border-color var(--transition);
@@ -493,29 +500,120 @@ select option {
   border-color: var(--border-focus);
 }
 
-.status-tabs {
+.controls-actions {
   display: flex;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 2px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.filter-tab {
-  background: transparent;
+.filter-dropdown-wrap {
+  position: relative;
+}
+
+.btn-filter-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.btn-filter-dropdown svg:first-child {
+  width: 14px;
+  height: 14px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.btn-filter-dropdown .chevron-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-filter-dropdown[aria-expanded="true"] .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.btn-filter-dropdown:hover {
+  background: var(--surface-hover);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: #141724;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: dropMenuIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
   border: none;
+  background: transparent;
   color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition);
+  width: 100%;
 }
 
-.filter-tab.is-active {
-  background: var(--surface);
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
+}
+
+.dropdown-item.is-selected {
+  background: rgba(99, 102, 241, 0.12);
+  color: #fff;
+  font-weight: 600;
+}
+
+.dropdown-check {
+  width: 14px;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .date-filter-chip {
@@ -550,14 +648,14 @@ select option {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 14px 18px;
   transition: all var(--transition);
   position: relative;
 }
 
 .task-item:hover {
   background: var(--surface-hover);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .task-item.is-done {
@@ -654,7 +752,7 @@ select option {
 }
 
 .task-title {
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.4;
@@ -1019,27 +1117,48 @@ select option {
 
 .toast-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 24px;
+  right: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   z-index: 2000;
+  pointer-events: none;
 }
 
 .toast {
-  background: var(--surface);
+  pointer-events: auto;
+  background: #141724;
   border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  animation: toastSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 280ms ease, transform 280ms ease;
 }
 
-.toast.toast--success { border-left: 3px solid var(--priority-low); }
-.toast.toast--error { border-left: 3px solid var(--priority-high); }
-.toast.toast--info { border-left: 3px solid var(--primary); }
+.toast.toast--success { border-left: 4px solid var(--priority-low); }
+.toast.toast--error { border-left: 4px solid var(--priority-high); }
+.toast.toast--info { border-left: 4px solid var(--primary); }
+
+.toast.is-leaving {
+  opacity: 0;
+  transform: translateX(30px) scale(0.95);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -1047,13 +1166,29 @@ select option {
   100% { background-position: 0% 50%; }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
   .page {
-    padding: 20px 14px 40px;
+    padding: 24px 14px 50px;
+  }
+  .controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .filter-dropdown-wrap {
+    flex: 1;
+  }
+  .btn-filter-dropdown {
+    width: 100%;
+    justify-content: space-between;
   }
   .creator-input-wrap {
     flex-direction: column;
   }
+  .btn-ai-action,
   .btn-add-task {
     width: 100%;
   }
