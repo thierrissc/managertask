@@ -3,6 +3,7 @@
 
   let tarefas = [];
   let filtroStatus = "todas";
+  let filtroRecorrencia = "todas";
   let filtroCategoria = "todas";
   let filtroData = null;
   let termoBusca = "";
@@ -283,6 +284,10 @@
       resultado = resultado.filter(t => t.concluida);
     }
 
+    if (filtroRecorrencia !== "todas") {
+      resultado = resultado.filter(t => (t.recorrencia || "unica").toLowerCase() === filtroRecorrencia);
+    }
+
     if (filtroCategoria !== "todas") {
       resultado = resultado.filter(t => (t.categoria || "geral").toLowerCase() === filtroCategoria);
     }
@@ -309,6 +314,9 @@
     } else if (ordenacao === "prioridade") {
       const peso = { alta: 3, media: 2, baixa: 1 };
       resultado.sort((a, b) => (peso[b.prioridade] || 2) - (peso[a.prioridade] || 2));
+    } else if (ordenacao === "recorrencia") {
+      const pesoRec = { diaria: 5, semanal: 4, mensal: 3, anual: 2, unica: 1 };
+      resultado.sort((a, b) => (pesoRec[b.recorrencia || "unica"] || 1) - (pesoRec[a.recorrencia || "unica"] || 1));
     } else if (ordenacao === "alfabetica") {
       resultado.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
     } else if (ordenacao === "antiga") {
@@ -1048,6 +1056,10 @@
     const statusFilterMenu = document.getElementById("statusFilterMenu");
     const statusFilterLabel = document.getElementById("statusFilterLabel");
 
+    const btnRecFilter = document.getElementById("btnRecFilter");
+    const recFilterMenu = document.getElementById("recFilterMenu");
+    const recFilterLabel = document.getElementById("recFilterLabel");
+
     const btnSortFilter = document.getElementById("btnSortFilter");
     const sortFilterMenu = document.getElementById("sortFilterMenu");
     const sortFilterLabel = document.getElementById("sortFilterLabel");
@@ -1058,6 +1070,10 @@
         const isOpen = !statusFilterMenu.hidden;
         statusFilterMenu.hidden = isOpen;
         btnStatusFilter.setAttribute("aria-expanded", String(!isOpen));
+        if (recFilterMenu) {
+          recFilterMenu.hidden = true;
+          if (btnRecFilter) btnRecFilter.setAttribute("aria-expanded", "false");
+        }
         if (sortFilterMenu) {
           sortFilterMenu.hidden = true;
           if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
@@ -1092,6 +1108,53 @@
       });
     }
 
+    if (btnRecFilter && recFilterMenu) {
+      btnRecFilter.addEventListener("click", e => {
+        e.stopPropagation();
+        const isOpen = !recFilterMenu.hidden;
+        recFilterMenu.hidden = isOpen;
+        btnRecFilter.setAttribute("aria-expanded", String(!isOpen));
+        if (statusFilterMenu) {
+          statusFilterMenu.hidden = true;
+          if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+        }
+        if (sortFilterMenu) {
+          sortFilterMenu.hidden = true;
+          if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      recFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("click", () => {
+          filtroRecorrencia = item.dataset.rec;
+          recFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+            el.classList.remove("is-selected");
+            const chk = el.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "";
+          });
+          item.classList.add("is-selected");
+          const chk = item.querySelector(".dropdown-check");
+          if (chk) chk.textContent = "✓";
+
+          const labels = {
+            todas: "Repetição: Todas",
+            diaria: "Repetição: Diárias",
+            semanal: "Repetição: Semanais",
+            mensal: "Repetição: Mensais",
+            anual: "Repetição: Anuais",
+            unica: "Repetição: Única vez"
+          };
+          if (recFilterLabel) {
+            recFilterLabel.textContent = labels[filtroRecorrencia] || "Repetição";
+          }
+
+          recFilterMenu.hidden = true;
+          btnRecFilter.setAttribute("aria-expanded", "false");
+          renderizarLista();
+        });
+      });
+    }
+
     if (btnSortFilter && sortFilterMenu) {
       btnSortFilter.addEventListener("click", e => {
         e.stopPropagation();
@@ -1101,6 +1164,10 @@
         if (statusFilterMenu) {
           statusFilterMenu.hidden = true;
           if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+        }
+        if (recFilterMenu) {
+          recFilterMenu.hidden = true;
+          if (btnRecFilter) btnRecFilter.setAttribute("aria-expanded", "false");
         }
       });
 
@@ -1119,6 +1186,7 @@
           const labels = {
             recente: "Ordenar: Recentes",
             prioridade: "Ordenar: Prioridade",
+            recorrencia: "Ordenar: Repetição",
             vencimento: "Ordenar: Prazo",
             alfabetica: "Ordenar: A-Z",
             antiga: "Ordenar: Antigas"
@@ -1138,6 +1206,10 @@
       if (statusFilterMenu && !statusFilterMenu.contains(e.target) && e.target !== btnStatusFilter) {
         statusFilterMenu.hidden = true;
         if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+      }
+      if (recFilterMenu && !recFilterMenu.contains(e.target) && e.target !== btnRecFilter) {
+        recFilterMenu.hidden = true;
+        if (btnRecFilter) btnRecFilter.setAttribute("aria-expanded", "false");
       }
       if (sortFilterMenu && !sortFilterMenu.contains(e.target) && e.target !== btnSortFilter) {
         sortFilterMenu.hidden = true;
