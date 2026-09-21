@@ -29,28 +29,37 @@ app = Flask(
 )
 app.secret_key = SECRET_KEY
 
+def get_client_ip():
+    x_forwarded_for = request.headers.get("X-Forwarded-For")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    return request.remote_addr or "127.0.0.1"
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route("/api/tasks", methods=["GET"])
 def listar_tarefas():
-    tarefas = get_all_tasks()
+    client_ip = get_client_ip()
+    tarefas = get_all_tasks(client_ip)
     tarefas_ordenadas = sorted(tarefas, key=lambda t: t.get("id", 0), reverse=True)
     return jsonify(tarefas_ordenadas), 200
 
 @app.route("/api/tasks", methods=["POST"])
 def criar_tarefa():
+    client_ip = get_client_ip()
     dados = request.get_json(silent=True) or {}
-    tarefa, erro = create_task(dados)
+    tarefa, erro = create_task(dados, client_ip)
     if erro:
         return jsonify({"erro": erro}), 400
     return jsonify(tarefa), 201
 
 @app.route("/api/tasks/<int:tarefa_id>", methods=["PUT"])
 def editar_tarefa(tarefa_id):
+    client_ip = get_client_ip()
     dados = request.get_json(silent=True) or {}
-    tarefa, erro = update_task(tarefa_id, dados)
+    tarefa, erro = update_task(tarefa_id, dados, client_ip)
     if erro:
         status_code = 404 if erro == "Tarefa não encontrada." else 400
         return jsonify({"erro": erro}), status_code
@@ -58,44 +67,50 @@ def editar_tarefa(tarefa_id):
 
 @app.route("/api/tasks/<int:tarefa_id>", methods=["DELETE"])
 def excluir_tarefa(tarefa_id):
-    removida = delete_task(tarefa_id)
+    client_ip = get_client_ip()
+    removida = delete_task(tarefa_id, client_ip)
     if not removida:
         return jsonify({"erro": "Tarefa não encontrada."}), 404
     return jsonify({"mensagem": "Tarefa excluída com sucesso."}), 200
 
 @app.route("/api/tasks/<int:tarefa_id>/toggle", methods=["PATCH"])
 def alternar_conclusao(tarefa_id):
-    tarefa = toggle_task(tarefa_id)
+    client_ip = get_client_ip()
+    tarefa = toggle_task(tarefa_id, client_ip)
     if tarefa is None:
         return jsonify({"erro": "Tarefa não encontrada."}), 404
     return jsonify(tarefa), 200
 
 @app.route("/api/tasks/<int:tarefa_id>/subtasks", methods=["POST"])
 def adicionar_subtarefa(tarefa_id):
+    client_ip = get_client_ip()
     dados = request.get_json(silent=True) or {}
     titulo = dados.get("titulo")
-    tarefa, erro = add_subtask(tarefa_id, titulo)
+    tarefa, erro = add_subtask(tarefa_id, titulo, client_ip)
     if erro:
         return jsonify({"erro": erro}), 400
     return jsonify(tarefa), 200
 
 @app.route("/api/tasks/<int:tarefa_id>/subtasks/<int:subtask_id>/toggle", methods=["PATCH"])
 def alternar_subtarefa(tarefa_id, subtask_id):
-    tarefa = toggle_subtask(tarefa_id, subtask_id)
+    client_ip = get_client_ip()
+    tarefa = toggle_subtask(tarefa_id, subtask_id, client_ip)
     if tarefa is None:
         return jsonify({"erro": "Tarefa ou subtarefa não encontrada."}), 404
     return jsonify(tarefa), 200
 
 @app.route("/api/tasks/<int:tarefa_id>/subtasks/<int:subtask_id>", methods=["DELETE"])
 def remover_subtarefa(tarefa_id, subtask_id):
-    tarefa = delete_subtask(tarefa_id, subtask_id)
+    client_ip = get_client_ip()
+    tarefa = delete_subtask(tarefa_id, subtask_id, client_ip)
     if tarefa is None:
         return jsonify({"erro": "Tarefa não encontrada."}), 404
     return jsonify(tarefa), 200
 
 @app.route("/api/tasks/clear-completed", methods=["POST"])
 def limpar_concluidas():
-    removidas = clear_completed()
+    client_ip = get_client_ip()
+    removidas = clear_completed(client_ip)
     return jsonify({"mensagem": f"{removidas} tarefas concluídas foram removidas.", "removidas": removidas}), 200
 
 @app.route("/api/ai/breakdown", methods=["POST"])
@@ -110,7 +125,8 @@ def quebrar_com_ia():
 
 @app.route("/api/stats", methods=["GET"])
 def estatisticas():
-    return jsonify(get_stats()), 200
+    client_ip = get_client_ip()
+    return jsonify(get_stats(client_ip)), 200
 
 if __name__ == "__main__":
-    app.run(debug=(FLASK_ENV == "development"), port=PORT)
+    app.run(host="0.0.0.0", debug=(FLASK_ENV == "development"), port=PORT)
