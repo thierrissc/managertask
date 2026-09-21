@@ -54,6 +54,7 @@
   const createTitulo = document.getElementById("createTitulo");
   const createDescricao = document.getElementById("createDescricao");
   const createPrioridade = document.getElementById("createPrioridade");
+  const createRecorrencia = document.getElementById("createRecorrencia");
   const createDataVencimento = document.getElementById("createDataVencimento");
   const btnCancelCreate = document.getElementById("btnCancelCreate");
   const btnCloseCreateX = document.getElementById("btnCloseCreateX");
@@ -67,6 +68,7 @@
   const editTitulo = document.getElementById("editTitulo");
   const editDescricao = document.getElementById("editDescricao");
   const editPrioridade = document.getElementById("editPrioridade");
+  const editRecorrencia = document.getElementById("editRecorrencia");
   const editCategoria = document.getElementById("editCategoria");
   const editDataVencimento = document.getElementById("editDataVencimento");
   const btnCancelEdit = document.getElementById("btnCancelEdit");
@@ -391,70 +393,21 @@
       titleEl.textContent = tarefa.titulo;
       titleRow.appendChild(titleEl);
 
-      const subtasks = tarefa.subtarefas || [];
-      let collapseWrap = null;
-      if (subtasks.length > 0) {
-        const subDone = subtasks.filter(s => s.concluida).length;
-        const allDone = subDone === subtasks.length;
-        const isChecklistOpen = openChecklistTaskIds.has(tarefa.id);
-
-        const checklistBadge = document.createElement("button");
-        checklistBadge.type = "button";
-        checklistBadge.className = `task-checklist-badge ${allDone ? "is-completed" : ""} ${isChecklistOpen ? "is-expanded" : ""}`;
-        checklistBadge.title = "Clique para abrir o checklist";
-        checklistBadge.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          <span>Checklist (${subDone}/${subtasks.length})</span>
-          <svg class="checklist-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      const recLabels = {
+        diaria: "Diária",
+        semanal: "Semanal",
+        mensal: "Mensal",
+        anual: "Anual"
+      };
+      if (tarefa.recorrencia && recLabels[tarefa.recorrencia]) {
+        const recBadge = document.createElement("span");
+        recBadge.className = "task-rec-badge";
+        recBadge.title = `Repetição: ${recLabels[tarefa.recorrencia]}`;
+        recBadge.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <span>${recLabels[tarefa.recorrencia]}</span>
         `;
-
-        collapseWrap = document.createElement("div");
-        collapseWrap.className = `subtasks-collapse-wrap ${isChecklistOpen ? "is-open" : ""}`;
-        collapseWrap.addEventListener("click", e => e.stopPropagation());
-
-        const subList = document.createElement("div");
-        subList.className = "subtasks-items-list";
-
-        subtasks.forEach(s => {
-          const row = document.createElement("div");
-          row.className = "subtask-single-row";
-
-          const left = document.createElement("label");
-          left.className = `subtask-single-left ${s.concluida ? "is-checked" : ""}`;
-
-          const subChk = document.createElement("input");
-          subChk.type = "checkbox";
-          subChk.checked = s.concluida;
-          subChk.addEventListener("change", (e) => {
-            e.stopPropagation();
-            toggleSubtarefa(tarefa.id, s.id);
-          });
-
-          const textSpan = document.createElement("span");
-          textSpan.textContent = s.titulo;
-
-          left.appendChild(subChk);
-          left.appendChild(textSpan);
-          row.appendChild(left);
-          subList.appendChild(row);
-        });
-
-        collapseWrap.appendChild(subList);
-
-        checklistBadge.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (openChecklistTaskIds.has(tarefa.id)) {
-            openChecklistTaskIds.delete(tarefa.id);
-            collapseWrap.classList.remove("is-open");
-            checklistBadge.classList.remove("is-expanded");
-          } else {
-            openChecklistTaskIds.add(tarefa.id);
-            collapseWrap.classList.add("is-open");
-            checklistBadge.classList.add("is-expanded");
-          }
-        });
-
-        titleRow.appendChild(checklistBadge);
+        titleRow.appendChild(recBadge);
       }
 
       if (dueInfo && !tarefa.concluida) {
@@ -487,8 +440,74 @@
         });
       }
 
-      if (collapseWrap) {
-        content.appendChild(collapseWrap);
+      const subtasks = tarefa.subtarefas || [];
+      if (subtasks.length > 0) {
+        const subDone = subtasks.filter(s => s.concluida).length;
+        const allDone = subDone === subtasks.length;
+        const isChecklistOpen = openChecklistTaskIds.has(tarefa.id);
+
+        const checkSection = document.createElement("div");
+        checkSection.className = "task-checklist-section";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = `task-checklist-toggle ${allDone ? "is-completed" : ""} ${isChecklistOpen ? "is-expanded" : ""}`;
+        toggleBtn.title = "Clique para abrir/fechar o checklist";
+        toggleBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Checklist (${subDone}/${subtasks.length})</span>
+          <svg class="checklist-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        `;
+
+        const collapseWrap = document.createElement("div");
+        collapseWrap.className = `subtasks-collapse-wrap ${isChecklistOpen ? "is-open" : ""}`;
+        collapseWrap.addEventListener("click", e => e.stopPropagation());
+
+        const subList = document.createElement("div");
+        subList.className = "subtasks-items-list";
+
+        subtasks.forEach(s => {
+          const row = document.createElement("div");
+          row.className = "subtask-single-row";
+
+          const left = document.createElement("label");
+          left.className = `subtask-single-left ${s.concluida ? "is-checked" : ""}`;
+
+          const subChk = document.createElement("input");
+          subChk.type = "checkbox";
+          subChk.checked = s.concluida;
+          subChk.addEventListener("change", (e) => {
+            e.stopPropagation();
+            toggleSubtarefa(tarefa.id, s.id);
+          });
+
+          const textSpan = document.createElement("span");
+          textSpan.textContent = s.titulo;
+
+          left.appendChild(subChk);
+          left.appendChild(textSpan);
+          row.appendChild(left);
+          subList.appendChild(row);
+        });
+
+        collapseWrap.appendChild(subList);
+
+        toggleBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (openChecklistTaskIds.has(tarefa.id)) {
+            openChecklistTaskIds.delete(tarefa.id);
+            collapseWrap.classList.remove("is-open");
+            toggleBtn.classList.remove("is-expanded");
+          } else {
+            openChecklistTaskIds.add(tarefa.id);
+            collapseWrap.classList.add("is-open");
+            toggleBtn.classList.add("is-expanded");
+          }
+        });
+
+        checkSection.appendChild(toggleBtn);
+        checkSection.appendChild(collapseWrap);
+        content.appendChild(checkSection);
       }
 
       const actions = document.createElement("div");
@@ -577,6 +596,7 @@
     if (createTitulo) createTitulo.value = tituloInicial;
     if (createDescricao) createDescricao.value = "";
     if (createPrioridade) createPrioridade.value = "media";
+    if (createRecorrencia) createRecorrencia.value = "unica";
     if (createDataVencimento) createDataVencimento.value = "";
     renderizarCreateSubtasks();
     if (createModalOverlay) {
@@ -632,6 +652,7 @@
       titulo: tit,
       descricao: createDescricao ? createDescricao.value.trim() : "",
       prioridade: createPrioridade ? createPrioridade.value : "media",
+      recorrencia: createRecorrencia ? createRecorrencia.value : "unica",
       categoria: "geral",
       data_vencimento: createDataVencimento ? createDataVencimento.value : "",
       subtarefas: subtarefasCriacao
@@ -742,6 +763,7 @@
     if (editTitulo) editTitulo.value = tarefa.titulo || "";
     if (editDescricao) editDescricao.value = tarefa.descricao || "";
     if (editPrioridade) editPrioridade.value = tarefa.prioridade || "media";
+    if (editRecorrencia) editRecorrencia.value = tarefa.recorrencia || "unica";
     if (editDataVencimento) editDataVencimento.value = tarefa.data_vencimento || "";
     subtarefasEdicao = JSON.parse(JSON.stringify(tarefa.subtarefas || []));
 
@@ -798,6 +820,7 @@
       titulo: tit,
       descricao: editDescricao ? editDescricao.value.trim() : "",
       prioridade: editPrioridade ? editPrioridade.value : "media",
+      recorrencia: editRecorrencia ? editRecorrencia.value : "unica",
       categoria: "geral",
       data_vencimento: editDataVencimento ? editDataVencimento.value : "",
       subtarefas: subtarefasEdicao
