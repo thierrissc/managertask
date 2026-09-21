@@ -269,6 +269,8 @@ def toggle_task(task_id, client_ip="127.0.0.1"):
             sub["concluida"] = True
     else:
         task["data_conclusao"] = None
+        for sub in task.get("subtarefas", []):
+            sub["concluida"] = False
     save_all_tasks(tasks, client_ip)
     return task
 
