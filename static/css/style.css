@@ -798,7 +798,10 @@ select option {
   gap: 6px;
 }
 
-.task-desc-chevron {
+.task-desc-chevron,
+.task-desc-hint {
+  display: inline-flex;
+  align-items: center;
   width: 13px;
   height: 13px;
   color: var(--text-muted);
@@ -806,7 +809,8 @@ select option {
   transition: transform var(--transition);
 }
 
-.task-item.is-expanded .task-desc-chevron {
+.task-item.is-expanded .task-desc-chevron,
+.task-item.is-expanded .task-desc-hint {
   transform: rotate(180deg);
   color: var(--primary);
 }
@@ -873,16 +877,19 @@ select option {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.28);
   color: #c4b5fd;
-  padding: 3px 8px;
+  padding: 2.5px 8px;
   border-radius: 6px;
   font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  font-family: inherit;
+  line-height: 1.2;
+  user-select: none;
   transition: all var(--transition);
 }
 
