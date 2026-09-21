@@ -109,10 +109,68 @@
           <input type="text" id="searchInput" placeholder="Buscar tarefas..." />
         </div>
 
-        <div class="status-tabs" role="tablist">
-          <button class="filter-tab is-active" data-status="todas">Todas</button>
-          <button class="filter-tab" data-status="pendentes">Pendentes</button>
-          <button class="filter-tab" data-status="concluidas">Concluídas</button>
+        <div class="controls-actions">
+          <div class="filter-dropdown-wrap" id="statusFilterWrap">
+            <button type="button" class="btn-filter-dropdown" id="btnStatusFilter" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span id="statusFilterLabel">Status: Todas</span>
+              <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="filter-dropdown-menu" id="statusFilterMenu" hidden>
+              <button type="button" class="dropdown-item is-selected" data-status="todas">
+                <span class="dropdown-check">✓</span>
+                <span>Todas</span>
+              </button>
+              <button type="button" class="dropdown-item" data-status="pendentes">
+                <span class="dropdown-check"></span>
+                <span>Pendentes</span>
+              </button>
+              <button type="button" class="dropdown-item" data-status="concluidas">
+                <span class="dropdown-check"></span>
+                <span>Concluídas</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-dropdown-wrap" id="sortFilterWrap">
+            <button type="button" class="btn-filter-dropdown" id="btnSortFilter" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="16" y2="6"></line>
+                <line x1="4" y1="12" x2="12" y2="12"></line>
+                <line x1="4" y1="18" x2="8" y2="18"></line>
+              </svg>
+              <span id="sortFilterLabel">Ordenar: Recentes</span>
+              <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="filter-dropdown-menu" id="sortFilterMenu" hidden>
+              <button type="button" class="dropdown-item is-selected" data-sort="recente">
+                <span class="dropdown-check">✓</span>
+                <span>Mais recentes</span>
+              </button>
+              <button type="button" class="dropdown-item" data-sort="prioridade">
+                <span class="dropdown-check"></span>
+                <span>Prioridade (Alta > Baixa)</span>
+              </button>
+              <button type="button" class="dropdown-item" data-sort="vencimento">
+                <span class="dropdown-check"></span>
+                <span>Prazo de vencimento</span>
+              </button>
+              <button type="button" class="dropdown-item" data-sort="alfabetica">
+                <span class="dropdown-check"></span>
+                <span>Ordem alfabética</span>
+              </button>
+              <button type="button" class="dropdown-item" data-sort="antiga">
+                <span class="dropdown-check"></span>
+                <span>Mais antigas</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
