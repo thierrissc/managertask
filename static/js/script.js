@@ -215,13 +215,16 @@
   }
 
   function mostrarToast(mensagem, tipo = "info") {
+    if (!toastContainer) return;
     const toast = document.createElement("div");
     toast.className = `toast toast--${tipo}`;
     toast.textContent = mensagem;
     toastContainer.appendChild(toast);
     setTimeout(() => {
       toast.classList.add("is-leaving");
-      toast.addEventListener("animationend", () => toast.remove());
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
     }, 2800);
   }
 
@@ -305,6 +308,8 @@
       resultado.sort((a, b) => (peso[b.prioridade] || 2) - (peso[a.prioridade] || 2));
     } else if (ordenacao === "alfabetica") {
       resultado.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+    } else if (ordenacao === "antiga") {
+      resultado.sort((a, b) => (a.id || 0) - (b.id || 0));
     } else {
       resultado.sort((a, b) => (b.id || 0) - (a.id || 0));
     }
@@ -990,20 +995,105 @@
       renderizarLista();
     });
 
-    if (sortSelect) {
-      sortSelect.addEventListener("change", e => {
-        ordenacao = e.target.value;
-        renderizarLista();
+    const btnStatusFilter = document.getElementById("btnStatusFilter");
+    const statusFilterMenu = document.getElementById("statusFilterMenu");
+    const statusFilterLabel = document.getElementById("statusFilterLabel");
+
+    const btnSortFilter = document.getElementById("btnSortFilter");
+    const sortFilterMenu = document.getElementById("sortFilterMenu");
+    const sortFilterLabel = document.getElementById("sortFilterLabel");
+
+    if (btnStatusFilter && statusFilterMenu) {
+      btnStatusFilter.addEventListener("click", e => {
+        e.stopPropagation();
+        const isOpen = !statusFilterMenu.hidden;
+        statusFilterMenu.hidden = isOpen;
+        btnStatusFilter.setAttribute("aria-expanded", String(!isOpen));
+        if (sortFilterMenu) {
+          sortFilterMenu.hidden = true;
+          if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      statusFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("click", () => {
+          filtroStatus = item.dataset.status;
+          statusFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+            el.classList.remove("is-selected");
+            const chk = el.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "";
+          });
+          item.classList.add("is-selected");
+          const chk = item.querySelector(".dropdown-check");
+          if (chk) chk.textContent = "✓";
+
+          const labels = {
+            todas: "Status: Todas",
+            pendentes: "Status: Pendentes",
+            concluidas: "Status: Concluídas"
+          };
+          if (statusFilterLabel) {
+            statusFilterLabel.textContent = labels[filtroStatus] || "Status";
+          }
+
+          statusFilterMenu.hidden = true;
+          btnStatusFilter.setAttribute("aria-expanded", "false");
+          renderizarLista();
+        });
       });
     }
 
-    document.querySelectorAll(".filter-tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("is-active"));
-        tab.classList.add("is-active");
-        filtroStatus = tab.dataset.status;
-        renderizarLista();
+    if (btnSortFilter && sortFilterMenu) {
+      btnSortFilter.addEventListener("click", e => {
+        e.stopPropagation();
+        const isOpen = !sortFilterMenu.hidden;
+        sortFilterMenu.hidden = isOpen;
+        btnSortFilter.setAttribute("aria-expanded", String(!isOpen));
+        if (statusFilterMenu) {
+          statusFilterMenu.hidden = true;
+          if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+        }
       });
+
+      sortFilterMenu.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("click", () => {
+          ordenacao = item.dataset.sort;
+          sortFilterMenu.querySelectorAll(".dropdown-item").forEach(el => {
+            el.classList.remove("is-selected");
+            const chk = el.querySelector(".dropdown-check");
+            if (chk) chk.textContent = "";
+          });
+          item.classList.add("is-selected");
+          const chk = item.querySelector(".dropdown-check");
+          if (chk) chk.textContent = "✓";
+
+          const labels = {
+            recente: "Ordenar: Recentes",
+            prioridade: "Ordenar: Prioridade",
+            vencimento: "Ordenar: Prazo",
+            alfabetica: "Ordenar: A-Z",
+            antiga: "Ordenar: Antigas"
+          };
+          if (sortFilterLabel) {
+            sortFilterLabel.textContent = labels[ordenacao] || "Ordenar";
+          }
+
+          sortFilterMenu.hidden = true;
+          btnSortFilter.setAttribute("aria-expanded", "false");
+          renderizarLista();
+        });
+      });
+    }
+
+    document.addEventListener("click", e => {
+      if (statusFilterMenu && !statusFilterMenu.contains(e.target) && e.target !== btnStatusFilter) {
+        statusFilterMenu.hidden = true;
+        if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+      }
+      if (sortFilterMenu && !sortFilterMenu.contains(e.target) && e.target !== btnSortFilter) {
+        sortFilterMenu.hidden = true;
+        if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
+      }
     });
 
     document.querySelectorAll(".cat-chip").forEach(chip => {
@@ -1125,6 +1215,10 @@
 
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") {
+        if (statusFilterMenu) statusFilterMenu.hidden = true;
+        if (btnStatusFilter) btnStatusFilter.setAttribute("aria-expanded", "false");
+        if (sortFilterMenu) sortFilterMenu.hidden = true;
+        if (btnSortFilter) btnSortFilter.setAttribute("aria-expanded", "false");
         calendarPopover.hidden = true;
         dateTrigger.setAttribute("aria-expanded", "false");
         fecharModalCriacao();
