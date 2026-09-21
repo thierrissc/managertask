@@ -19,7 +19,7 @@ from api.services.task_service import (
     clear_completed,
     get_stats,
 )
-from api.services.ai_service import breakdown_task_with_ai
+from api.services.ai_service import breakdown_task_with_ai, suggest_new_tasks_with_ai
 
 app = Flask(
     __name__,
@@ -122,6 +122,13 @@ def quebrar_com_ia():
         return jsonify({"erro": "Título é obrigatório para quebra de tarefas."}), 400
     subtarefas = breakdown_task_with_ai(titulo, descricao)
     return jsonify({"subtarefas": subtarefas}), 200
+
+@app.route("/api/ai/suggest-tasks", methods=["GET", "POST"])
+def sugerir_tarefas_ia():
+    client_ip = get_client_ip()
+    tarefas_existentes = get_all_tasks(client_ip)
+    sugestoes = suggest_new_tasks_with_ai(tarefas_existentes)
+    return jsonify({"sugestoes": sugestoes}), 200
 
 @app.route("/api/stats", methods=["GET"])
 def estatisticas():
