@@ -91,6 +91,11 @@
   const btnEditFromNoteModal = document.getElementById("btnEditFromNoteModal");
   let idParaVerNota = null;
 
+  const aiSuggestModalOverlay = document.getElementById("aiSuggestModalOverlay");
+  const aiSuggestionsContainer = document.getElementById("aiSuggestionsContainer");
+  const btnCloseAiSuggestModalX = document.getElementById("btnCloseAiSuggestModalX");
+  const btnCloseAiSuggestModal = document.getElementById("btnCloseAiSuggestModal");
+
   const shortcutsModalOverlay = document.getElementById("shortcutsModalOverlay");
   const btnOpenShortcuts = document.getElementById("btnOpenShortcuts");
   const btnCloseShortcuts = document.getElementById("btnCloseShortcuts");
@@ -204,6 +209,7 @@
     confirmModalOverlay.hidden = true;
     shortcutsModalOverlay.hidden = true;
     if (noteModalOverlay) noteModalOverlay.hidden = true;
+    if (aiSuggestModalOverlay) aiSuggestModalOverlay.hidden = true;
     restaurarFiltrosSalvos();
     atualizarHeaderDate();
     carregarTarefas();
@@ -687,12 +693,22 @@
     abrirModalCriacao(titulo);
   }
 
-  function abrirModalCriacao(tituloInicial = "") {
+  function abrirModalCriacao(tituloInicial = "", descricaoInicial = "", prioridadeInicial = "media", recorrenciaInicial = "unica", subtarefasIniciais = []) {
     if (createTitulo) createTitulo.value = tituloInicial;
-    if (createDescricao) createDescricao.value = "";
-    if (createPrioridade) createPrioridade.value = "media";
-    if (createRecorrencia) createRecorrencia.value = "unica";
+    if (createDescricao) createDescricao.value = descricaoInicial;
+    if (createPrioridade) createPrioridade.value = prioridadeInicial;
+    if (createRecorrencia) createRecorrencia.value = recorrenciaInicial;
     if (createDataVencimento) createDataVencimento.value = "";
+    if (Array.isArray(subtarefasIniciais) && subtarefasIniciais.length > 0) {
+      subtarefasCriacao = subtarefasIniciais.map(item => {
+        if (typeof item === "string") {
+          return { id: Date.now() + Math.floor(Math.random() * 1000), titulo: item, concluida: false };
+        }
+        return item;
+      });
+    } else {
+      subtarefasCriacao = [];
+    }
     renderizarCreateSubtasks();
     if (createModalOverlay) {
       createModalOverlay.hidden = false;
@@ -816,10 +832,7 @@
   async function quebrarComIA() {
     const tit = tituloInput.value.trim();
     if (!tit) {
-      tituloInput.classList.add("input-invalid");
-      setTimeout(() => tituloInput.classList.remove("input-invalid"), 600);
-      mostrarToast("Por favor, preencha o que você precisa fazer.", "error");
-      tituloInput.focus();
+      sugerirAtividadesComIA();
       return;
     }
 
@@ -850,6 +863,156 @@
     } finally {
       btnAiSuggest.disabled = false;
       btnAiSuggest.style.opacity = "1";
+    }
+  }
+
+  function abrirModalSugestoesIA() {
+    if (aiSuggestModalOverlay) aiSuggestModalOverlay.hidden = false;
+  }
+
+  function fecharModalSugestoesIA() {
+    if (aiSuggestModalOverlay) aiSuggestModalOverlay.hidden = true;
+  }
+
+  async function sugerirAtividadesComIA() {
+    abrirModalSugestoesIA();
+    if (aiSuggestionsContainer) {
+      aiSuggestionsContainer.innerHTML = `
+        <div class="ai-loading-state">
+          <div class="ai-loading-spinner"></div>
+          <p>Analisando seu histórico de tarefas para sugerir as próximas atividades...</p>
+        </div>
+      `;
+    }
+
+    try {
+      const resp = await fetch("/api/ai/suggest-tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!resp.ok) throw new Error();
+      const data = await resp.json();
+      const sugestoes = data.sugestoes || [];
+      renderizarSugestoesIA(sugestoes);
+    } catch (err) {
+      if (aiSuggestionsContainer) {
+        aiSuggestionsContainer.innerHTML = `
+          <div class="ai-loading-state">
+            <p style="color:var(--priority-high);">Não foi possível obter sugestões da IA no momento.</p>
+            <button type="button" class="btn-secondary" id="btnRetryAiSuggest" style="margin-top:8px;">Tentar novamente</button>
+          </div>
+        `;
+        const btnRetry = document.getElementById("btnRetryAiSuggest");
+        if (btnRetry) btnRetry.addEventListener("click", sugerirAtividadesComIA);
+      }
+      mostrarToast("Erro ao carregar sugestões da IA.", "error");
+    }
+  }
+
+  function renderizarSugestoesIA(sugestoes) {
+    if (!aiSuggestionsContainer) return;
+    if (!sugestoes || sugestoes.length === 0) {
+      aiSuggestionsContainer.innerHTML = `
+        <div class="ai-loading-state">
+          <p>Nenhuma sugestão disponível no momento.</p>
+        </div>
+      `;
+      return;
+    }
+
+    aiSuggestionsContainer.innerHTML = "";
+    sugestoes.forEach(sug => {
+      const card = document.createElement("div");
+      card.className = "ai-suggestion-card";
+
+      const badgePriClass = sug.prioridade === "alta" ? "ai-card-badge--alta" : (sug.prioridade === "baixa" ? "ai-card-badge--baixa" : "ai-card-badge--media");
+      const priLabel = sug.prioridade ? (sug.prioridade.charAt(0).toUpperCase() + sug.prioridade.slice(1)) : "Média";
+      const recLabel = sug.recorrencia ? (sug.recorrencia.charAt(0).toUpperCase() + sug.recorrencia.slice(1)) : "Única";
+
+      let subtasksHtml = "";
+      if (Array.isArray(sug.subtarefas) && sug.subtarefas.length > 0) {
+        subtasksHtml = `
+          <div class="ai-card-subtasks">
+            ${sug.subtarefas.map(sub => `
+              <div class="ai-card-subtask-item">
+                <span class="ai-card-subtask-bullet">✦</span>
+                <span>${typeof sub === "string" ? sub : (sub.titulo || "")}</span>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="ai-card-header">
+          <div class="ai-card-title">${sug.titulo}</div>
+          <div class="ai-card-meta">
+            <span class="ai-card-badge ${badgePriClass}">${priLabel}</span>
+            <span class="ai-card-badge ai-card-badge--rec">${recLabel}</span>
+          </div>
+        </div>
+        ${sug.descricao ? `<div class="ai-card-desc">${sug.descricao}</div>` : ""}
+        ${subtasksHtml}
+        <div class="ai-card-actions">
+          <button type="button" class="ai-btn-edit">Personalizar</button>
+          <button type="button" class="ai-btn-add">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Adicionar
+          </button>
+        </div>
+      `;
+
+      const btnAdd = card.querySelector(".ai-btn-add");
+      btnAdd.addEventListener("click", async () => {
+        btnAdd.disabled = true;
+        btnAdd.textContent = "Adicionando...";
+        await criarTarefaDireto(sug);
+        fecharModalSugestoesIA();
+      });
+
+      const btnEdit = card.querySelector(".ai-btn-edit");
+      btnEdit.addEventListener("click", () => {
+        fecharModalSugestoesIA();
+        abrirModalCriacao(sug.titulo, sug.descricao, sug.prioridade, sug.recorrencia, sug.subtarefas);
+      });
+
+      aiSuggestionsContainer.appendChild(card);
+    });
+  }
+
+  async function criarTarefaDireto(sug) {
+    const subtarefasFormatadas = (sug.subtarefas || []).map(st => ({
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      titulo: typeof st === "string" ? st : (st.titulo || ""),
+      concluida: false
+    }));
+
+    const payload = {
+      titulo: sug.titulo,
+      descricao: sug.descricao || "",
+      prioridade: sug.prioridade || "media",
+      recorrencia: sug.recorrencia || "unica",
+      categoria: "geral",
+      data_vencimento: "",
+      subtarefas: subtarefasFormatadas
+    };
+
+    try {
+      const resp = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) throw new Error();
+      const nova = await resp.json();
+      tarefas.unshift(nova);
+      renderizarTudo();
+      mostrarToast(`Tarefa "${sug.titulo}" adicionada com sucesso!`, "success");
+    } catch (err) {
+      mostrarToast("Erro ao adicionar tarefa sugerida.", "error");
     }
   }
 
@@ -1452,6 +1615,14 @@
       });
     }
 
+    if (btnCloseAiSuggestModalX) btnCloseAiSuggestModalX.addEventListener("click", fecharModalSugestoesIA);
+    if (btnCloseAiSuggestModal) btnCloseAiSuggestModal.addEventListener("click", fecharModalSugestoesIA);
+    if (aiSuggestModalOverlay) {
+      aiSuggestModalOverlay.addEventListener("click", e => {
+        if (e.target === aiSuggestModalOverlay) fecharModalSugestoesIA();
+      });
+    }
+
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") {
         if (statusFilterMenu) statusFilterMenu.hidden = true;
@@ -1466,6 +1637,7 @@
         fecharModalEdicao();
         fecharModalConfirmacao();
         fecharModalNota();
+        fecharModalSugestoesIA();
         shortcutsModalOverlay.hidden = true;
       } else if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
         e.preventDefault();
