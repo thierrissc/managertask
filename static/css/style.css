@@ -1577,6 +1577,50 @@ select option {
   font-size: 11px;
 }
 
+.modal-backup-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-backup-actions button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.modal-backup-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.modal-backup-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-backup-actions .btn-primary {
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: #fff;
+  border: none;
+}
+
+.modal-backup-actions .btn-primary:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.4);
+}
+
 .toast-container {
   position: fixed;
   bottom: 24px;
