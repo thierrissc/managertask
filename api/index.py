@@ -18,6 +18,7 @@ from api.services.task_service import (
     delete_subtask,
     clear_completed,
     get_stats,
+    import_tasks,
 )
 from api.services.ai_service import breakdown_task_with_ai, suggest_new_tasks_with_ai
 
@@ -112,6 +113,21 @@ def limpar_concluidas():
     client_ip = get_client_ip()
     removidas = clear_completed(client_ip)
     return jsonify({"mensagem": f"{removidas} tarefas concluídas foram removidas.", "removidas": removidas}), 200
+
+@app.route("/api/tasks/import", methods=["POST"])
+def importar_backup():
+    client_ip = get_client_ip()
+    dados = request.get_json(silent=True)
+    if dados is None:
+        return jsonify({"erro": "Nenhum dado enviado para importação."}), 400
+    tarefas, erro = import_tasks(dados, client_ip)
+    if erro:
+        return jsonify({"erro": erro}), 400
+    return jsonify({
+        "mensagem": f"Backup importado com sucesso! {len(tarefas)} tarefas restauradas.",
+        "tarefas": tarefas,
+        "total": len(tarefas)
+    }), 200
 
 @app.route("/api/ai/breakdown", methods=["POST"])
 def quebrar_com_ia():
