@@ -101,6 +101,8 @@
   const btnCloseShortcuts = document.getElementById("btnCloseShortcuts");
 
   const btnExportTasks = document.getElementById("btnExportTasks");
+  const btnImportTasks = document.getElementById("btnImportTasks");
+  const importFileInput = document.getElementById("importFileInput");
   const btnClearCompleted = document.getElementById("btnClearCompleted");
   const toastContainer = document.getElementById("toastContainer");
 
@@ -1195,6 +1197,52 @@
     mostrarToast("Backup JSON exportado com sucesso!", "success");
   }
 
+  async function importarTarefasArquivo(file) {
+    if (!file) return;
+
+    if (!file.name.endsWith(".json") && file.type !== "application/json" && file.type !== "") {
+      mostrarToast("Selecione um arquivo de backup em formato .json", "error");
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      let dados;
+      try {
+        dados = JSON.parse(text);
+      } catch (e) {
+        mostrarToast("O arquivo selecionado não contém um JSON válido.", "error");
+        return;
+      }
+
+      mostrarToast("Restaurando backup...", "info");
+
+      const resp = await fetch("/api/tasks/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.erro || "Falha ao importar backup.");
+      }
+
+      const data = await resp.json();
+      tarefas = data.tarefas || [];
+      if (shortcutsModalOverlay) {
+        shortcutsModalOverlay.hidden = true;
+      }
+      if (importFileInput) {
+        importFileInput.value = "";
+      }
+      renderizarTudo();
+      mostrarToast(data.mensagem || "Backup restaurado com sucesso!", "success");
+    } catch (err) {
+      mostrarToast(err.message || "Erro ao importar backup.", "error");
+    }
+  }
+
   function renderizarCalendario() {
     calendarGrid.innerHTML = "";
     const diasNoMes = new Date(mesExibidoAno, mesExibidoMes + 1, 0).getDate();
@@ -1498,6 +1546,17 @@
     const exportBtn = document.getElementById("btnExportTasks");
     if (exportBtn) {
       exportBtn.addEventListener("click", exportarTarefas);
+    }
+    if (btnImportTasks && importFileInput) {
+      btnImportTasks.addEventListener("click", () => {
+        importFileInput.click();
+      });
+      importFileInput.addEventListener("change", e => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          importarTarefasArquivo(file);
+        }
+      });
     }
 
     dateTrigger.addEventListener("click", () => {
