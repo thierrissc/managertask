@@ -4,11 +4,42 @@
       "initialized": true,
       "tasks": [
         {
+          "id": 1,
+          "titulo": "Estudar para concurso",
+          "descricao": "Focar nas disciplinas de maior peso do edital, fazer resumos esquematizados e praticar resolução de questões comentadas.",
+          "prioridade": "alta",
+          "categoria": "estudos",
+          "recorrencia": "diaria",
+          "data_vencimento": "",
+          "hora_vencimento": "",
+          "subtarefas": [
+            {
+              "id": 1,
+              "titulo": "Revisar Direito Constitucional",
+              "concluida": false
+            },
+            {
+              "id": 2,
+              "titulo": "Resolver 30 questões de Português",
+              "concluida": false
+            },
+            {
+              "id": 3,
+              "titulo": "Simulado prático de Redação",
+              "concluida": false
+            }
+          ],
+          "concluida": false,
+          "data_criacao": "2026-09-22",
+          "data_conclusao": null
+        },
+        {
           "id": 2,
           "titulo": "Estudar para prova",
           "descricao": "Revisar anotações de aula, fórmulas fundamentais e refazer os exercícios mais desafiadores da lista recomendada.",
           "prioridade": "media",
           "categoria": "estudos",
+          "recorrencia": "unica",
           "data_vencimento": "",
           "hora_vencimento": "",
           "subtarefas": [
@@ -24,39 +55,8 @@
             }
           ],
           "concluida": false,
-          "data_criacao": "2026-09-21",
-          "data_conclusao": null,
-          "recorrencia": "unica"
-        },
-        {
-          "id": 3,
-          "titulo": "Estudar para concurso",
-          "descricao": "Focar nas disciplinas de maior peso do edital, fazer resumos esquematizados e praticar resolucao de questoes comentadas.",
-          "prioridade": "alta",
-          "categoria": "estudos",
-          "data_vencimento": "",
-          "hora_vencimento": "",
-          "subtarefas": [
-            {
-              "id": 1,
-              "titulo": "Revisar Direito Constitucional",
-              "concluida": false
-            },
-            {
-              "id": 2,
-              "titulo": "Fazer 30 questoes de Portugues",
-              "concluida": false
-            },
-            {
-              "id": 3,
-              "titulo": "Simulado pratico de Redacao",
-              "concluida": false
-            }
-          ],
-          "concluida": false,
-          "data_criacao": "2026-09-21",
-          "data_conclusao": null,
-          "recorrencia": "unica"
+          "data_criacao": "2026-09-22",
+          "data_conclusao": null
         }
       ]
     }
