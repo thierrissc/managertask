@@ -351,3 +351,91 @@ def get_stats(client_ip="127.0.0.1"):
         "atrasadas": atrasadas,
         "alta_prioridade": alta_prioridade
     }
+
+def import_tasks(backup_data, client_ip="127.0.0.1"):
+    raw_list = []
+    if isinstance(backup_data, list):
+        raw_list = backup_data
+    elif isinstance(backup_data, dict):
+        if "tasks" in backup_data and isinstance(backup_data["tasks"], list):
+            raw_list = backup_data["tasks"]
+        elif "tarefas" in backup_data and isinstance(backup_data["tarefas"], list):
+            raw_list = backup_data["tarefas"]
+        else:
+            return None, "Formato de arquivo inválido. Deve ser uma lista de tarefas em JSON."
+    else:
+        return None, "Formato de arquivo inválido. Deve ser uma lista de tarefas em JSON."
+
+    sanitized = []
+    current_max_id = 0
+    today_str = datetime.now().strftime("%Y-%m-%d")
+
+    for idx, item in enumerate(raw_list):
+        if not isinstance(item, dict):
+            continue
+        titulo = (item.get("titulo") or item.get("title") or "").strip()
+        if not titulo:
+            continue
+
+        raw_id = item.get("id")
+        try:
+            task_id = int(raw_id) if raw_id is not None else (idx + 1)
+        except (ValueError, TypeError):
+            task_id = idx + 1
+
+        if task_id > current_max_id:
+            current_max_id = task_id
+
+        prioridade = str(item.get("prioridade") or "media").strip().lower()
+        if prioridade not in ["alta", "media", "baixa"]:
+            prioridade = "media"
+
+        recorrencia = str(item.get("recorrencia") or "unica").strip().lower()
+        if recorrencia not in ["unica", "diaria", "semanal", "mensal", "anual"]:
+            recorrencia = "unica"
+
+        categoria = str(item.get("categoria") or "geral").strip().lower()
+
+        subtarefas_raw = item.get("subtarefas") or []
+        subtarefas = []
+        sub_id = 1
+        for sub in subtarefas_raw:
+            if isinstance(sub, dict):
+                st_title = str(sub.get("titulo") or "").strip()
+                st_done = bool(sub.get("concluida", False))
+            else:
+                st_title = str(sub).strip()
+                st_done = False
+            if st_title:
+                subtarefas.append({
+                    "id": sub_id,
+                    "titulo": st_title,
+                    "concluida": st_done
+                })
+                sub_id += 1
+
+        sanitized.append({
+            "id": task_id,
+            "titulo": titulo,
+            "descricao": str(item.get("descricao") or "").strip(),
+            "prioridade": prioridade,
+            "categoria": categoria,
+            "recorrencia": recorrencia,
+            "data_vencimento": str(item.get("data_vencimento") or "").strip(),
+            "hora_vencimento": str(item.get("hora_vencimento") or "").strip(),
+            "subtarefas": subtarefas,
+            "concluida": bool(item.get("concluida", False)),
+            "data_criacao": str(item.get("data_criacao") or today_str).strip(),
+            "data_conclusao": item.get("data_conclusao") if item.get("concluida") else None
+        })
+
+    used_ids = set()
+    next_id = current_max_id + 1
+    for t in sanitized:
+        if t["id"] in used_ids or t["id"] <= 0:
+            t["id"] = next_id
+            next_id += 1
+        used_ids.add(t["id"])
+
+    save_all_tasks(sanitized, client_ip)
+    return sanitized, None
